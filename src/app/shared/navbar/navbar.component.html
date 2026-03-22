@@ -1,0 +1,202 @@
+<nav class="nav-shell">
+  <div class="nav-inner">
+
+    <!-- Brand -->
+    <a routerLink="/home" class="brand">
+      <div class="brand-mark">🌿</div>
+      <div class="brand-text">
+        <span class="brand-name">Wellbeing</span>
+        <span class="brand-sub">espace bien-être</span>
+      </div>
+    </a>
+
+    <!-- Nav Links -->
+    <div class="nav-links" [class.open]="menuOpen">
+      <a *ngFor="let item of navItems; let i = index"
+         [routerLink]="item.path"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{
+           exact: item.path === '/home'
+         }"
+         class="nav-pill"
+         [style.animation-delay]="i * 0.05 + 's'"
+         (click)="menuOpen = false">
+        <span class="pill-icon">{{ item.icon }}</span>
+        <span class="pill-label">{{ item.label }}</span>
+      </a>
+    </div>
+
+    <!-- Actions -->
+    <div class="nav-actions">
+
+      <!-- Admin chip -->
+      <a *ngIf="user?.role === 'ADMIN'"
+         routerLink="/admin"
+         class="admin-chip">
+        <span>⚙️</span>
+        <span>Admin</span>
+      </a>
+
+      <!-- ✅ Cloche Notifications -->
+      <div class="notif-trigger"
+           (click)="toggleNotifications()">
+
+        <div class="notif-bell">
+          <span class="bell-icon">🔔</span>
+          <span class="notif-badge"
+                *ngIf="unreadCount > 0">
+            {{ unreadCount > 9 ? '9+' : unreadCount }}
+          </span>
+        </div>
+
+        <!-- ✅ Dropdown Notifications -->
+        <div class="notif-dropdown"
+             *ngIf="showNotifications"
+             (click)="$event.stopPropagation()">
+
+          <div class="notif-header">
+            <span class="notif-title">
+              🔔 Notifications
+            </span>
+            <button class="notif-read-all"
+                    *ngIf="unreadCount > 0"
+                    (click)="markAllAsRead()">
+              Tout lire
+            </button>
+          </div>
+
+          <div class="notif-empty"
+               *ngIf="notifications.length === 0">
+            <span>🔕</span>
+            <p>Aucune notification</p>
+          </div>
+
+          <div class="notif-list"
+               *ngIf="notifications.length > 0">
+            <div *ngFor="let n of notifications"
+                 class="notif-item"
+                 [class.unread]="!n.read"
+                 (click)="markAsRead(n)">
+              <div class="notif-icon">
+                {{ getNotifIcon(n.type) }}
+              </div>
+              <div class="notif-content">
+                <div class="notif-item-title">
+                  {{ n.title }}
+                </div>
+                <div class="notif-item-msg">
+                  {{ n.message }}
+                </div>
+                <div class="notif-item-time">
+                  {{ formatTime(n.createdAt) }}
+                </div>
+              </div>
+              <button class="notif-del"
+                      (click)="deleteNotification(
+                        n.id, $event)">
+                ✕
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div class="profile-trigger"
+           (click)="dropdownOpen = !dropdownOpen">
+
+        <div class="avatar-wrap">
+          <div class="avatar">
+            {{ user?.firstName?.charAt(0) }}{{
+               user?.lastName?.charAt(0) }}
+          </div>
+          <div class="avatar-status"></div>
+        </div>
+
+        <div class="profile-info">
+          <span class="profile-name">
+            {{ user?.firstName }}
+          </span>
+          <span class="profile-role">
+            {{ user?.role }}
+          </span>
+        </div>
+
+        <svg class="chevron"
+             [class.rotated]="dropdownOpen"
+             width="14" height="14"
+             viewBox="0 0 14 14">
+          <path d="M3 5l4 4 4-4"
+                stroke="currentColor"
+                stroke-width="1.5" fill="none"
+                stroke-linecap="round"/>
+        </svg>
+
+        <!-- Dropdown Profil -->
+        <div class="profile-dropdown"
+             *ngIf="dropdownOpen">
+
+          <div class="dropdown-header">
+            <div class="dh-avatar">
+              {{ user?.firstName?.charAt(0) }}{{
+                 user?.lastName?.charAt(0) }}
+            </div>
+            <div class="dh-info">
+              <div class="dh-name">
+                {{ user?.firstName }} {{ user?.lastName }}
+              </div>
+              <div class="dh-email">
+                {{ user?.email }}
+              </div>
+              <div class="dh-role-badge">
+                {{ user?.role }}
+              </div>
+            </div>
+          </div>
+
+          <div class="dropdown-divider"></div>
+
+          <a routerLink="/home/profile"
+             class="dropdown-item"
+             (click)="dropdownOpen = false">
+            <span class="di-icon">👤</span>
+            <span>Mon profil</span>
+          </a>
+
+          <a routerLink="/home/moods"
+             class="dropdown-item"
+             (click)="dropdownOpen = false">
+            <span class="di-icon">😊</span>
+            <span>Mon humeur</span>
+          </a>
+
+          <a routerLink="/home/events"
+             class="dropdown-item"
+             (click)="dropdownOpen = false">
+            <span class="di-icon">📅</span>
+            <span>Mes événements</span>
+          </a>
+
+          <div class="dropdown-divider"></div>
+
+          <button class="dropdown-item danger"
+                  (click)="logout()">
+            <span class="di-icon">🚪</span>
+            <span>Déconnexion</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Burger -->
+      <button class="burger"
+              (click)="menuOpen = !menuOpen">
+        <span [class.open]="menuOpen"></span>
+        <span [class.open]="menuOpen"></span>
+        <span [class.open]="menuOpen"></span>
+      </button>
+
+    </div>
+  </div>
+</nav>

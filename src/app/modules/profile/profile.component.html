@@ -1,0 +1,341 @@
+<div class="profile-container">
+
+  <!-- ─── Hero Card ─── -->
+  <div class="profile-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+
+      <!-- Avatar -->
+      <div class="avatar-wrap">
+        <div class="avatar-circle"
+             [style.background]="getAvatarColor()">
+          {{ getInitials() }}
+        </div>
+        <div class="avatar-status"></div>
+      </div>
+
+      <!-- Info -->
+      <div class="hero-info">
+        <h2 class="hero-name">
+          {{ user?.firstName }} {{ user?.lastName }}
+        </h2>
+        <div class="hero-badges">
+          <span class="role-badge">
+            {{ user?.role === 'ADMIN' ? '⚙️ Admin'
+                                     : '🌿 Membre' }}
+          </span>
+          <span class="date-badge">
+            📅 Membre depuis {{ getMemberSince() }}
+          </span>
+          <span class="email-badge">
+            📧 {{ user?.email }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Stats rapides -->
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hs-value">{{ stats.moods }}</div>
+          <div class="hs-label">Humeurs</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hs-value">{{ stats.events }}</div>
+          <div class="hs-label">Événements</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hs-value">{{ stats.complaints }}</div>
+          <div class="hs-label">Réclamations</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── Tabs ─── -->
+  <div class="profile-tabs">
+    <button class="profile-tab"
+            [class.active]="activeTab === 'info'"
+            (click)="setTab('info')">
+      👤 Mes informations
+    </button>
+    <button class="profile-tab"
+            [class.active]="activeTab === 'activity'"
+            (click)="setTab('activity')">
+      📊 Mon activité
+    </button>
+    <button class="profile-tab"
+            [class.active]="activeTab === 'security'"
+            (click)="setTab('security')">
+      🔒 Sécurité
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="success"
+       class="alert-bar alert-success">
+    ✅ {{ success }}
+  </div>
+  <div *ngIf="error"
+       class="alert-bar alert-error">
+    ❌ {{ error }}
+  </div>
+
+  <!-- ─── Tab: Informations ─── -->
+  <div class="tab-content" *ngIf="activeTab === 'info'">
+    <div class="profile-card">
+      <div class="card-header-row">
+        <div class="card-title">
+          Informations personnelles
+        </div>
+        <div class="card-sub">
+          Modifiez vos informations de profil
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="saveProfile()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Prénom</label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text"
+                     class="form-input"
+                     formControlName="firstName"
+                     placeholder="Votre prénom">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Nom</label>
+            <div class="input-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text"
+                     class="form-input"
+                     formControlName="lastName"
+                     placeholder="Votre nom">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-wrap">
+              <span class="input-icon">📧</span>
+              <input type="email"
+                     class="form-input"
+                     formControlName="email"
+                     placeholder="votre@email.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Téléphone</label>
+            <div class="input-wrap">
+              <span class="input-icon">📱</span>
+              <input type="tel"
+                     class="form-input"
+                     formControlName="phone"
+                     placeholder="0612345678">
+            </div>
+          </div>
+        </div>
+
+        <!-- Role (readonly) -->
+        <div class="form-group">
+          <label>Rôle</label>
+          <div class="role-display">
+            <span class="role-icon">
+              {{ user?.role === 'ADMIN' ? '⚙️' : '🌿' }}
+            </span>
+            <span>{{ user?.role }}</span>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit"
+                  class="btn-save"
+                  [disabled]="form.invalid || saving">
+            <span *ngIf="saving"
+                  class="spinner-sm"></span>
+            {{ saving ? 'Enregistrement...'
+                      : '💾 Enregistrer les modifications' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ─── Tab: Activité ─── -->
+  <div class="tab-content"
+       *ngIf="activeTab === 'activity'">
+    <div class="activity-grid">
+
+      <!-- Humeurs -->
+      <a routerLink="/home/moods"
+         class="activity-card mood-card">
+        <div class="ac-icon">😊</div>
+        <div class="ac-info">
+          <div class="ac-value">{{ stats.moods }}</div>
+          <div class="ac-label">Entrées d'humeur</div>
+          <div class="ac-desc">
+            Suivez votre bien-être quotidien
+          </div>
+        </div>
+        <div class="ac-arrow">→</div>
+      </a>
+
+      <!-- Événements -->
+      <a routerLink="/home/events"
+         class="activity-card event-card">
+        <div class="ac-icon">📅</div>
+        <div class="ac-info">
+          <div class="ac-value">{{ stats.events }}</div>
+          <div class="ac-label">Événements inscrits</div>
+          <div class="ac-desc">
+            Vos activités bien-être
+          </div>
+        </div>
+        <div class="ac-arrow">→</div>
+      </a>
+
+      <!-- Réclamations -->
+      <a routerLink="/home/complaints"
+         class="activity-card complaint-card">
+        <div class="ac-icon">📢</div>
+        <div class="ac-info">
+          <div class="ac-value">
+            {{ stats.complaints }}
+          </div>
+          <div class="ac-label">Réclamations</div>
+          <div class="ac-desc">
+            Vos demandes soumises
+          </div>
+        </div>
+        <div class="ac-arrow">→</div>
+      </a>
+
+      <!-- Messages -->
+      <a routerLink="/home/chat"
+         class="activity-card chat-card">
+        <div class="ac-icon">💬</div>
+        <div class="ac-info">
+          <div class="ac-value">
+            {{ stats.messages }}
+          </div>
+          <div class="ac-label">Messages envoyés</div>
+          <div class="ac-desc">
+            Vos conversations
+          </div>
+        </div>
+        <div class="ac-arrow">→</div>
+      </a>
+
+    </div>
+
+    <!-- Liens rapides -->
+    <div class="profile-card mt-3">
+      <div class="card-title mb-3">Accès rapides</div>
+      <div class="quick-links">
+        <a routerLink="/home/moods"
+           class="quick-link">
+          <span>😊</span> Enregistrer mon humeur
+        </a>
+        <a routerLink="/home/events"
+           class="quick-link">
+          <span>📅</span> Voir les événements
+        </a>
+        <a routerLink="/home/resources"
+           class="quick-link">
+          <span>📚</span> Lire des ressources
+        </a>
+        <a routerLink="/home/chat"
+           class="quick-link">
+          <span>💬</span> Envoyer un message
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Tab: Sécurité ─── -->
+  <div class="tab-content"
+       *ngIf="activeTab === 'security'">
+    <div class="profile-card">
+      <div class="card-header-row">
+        <div class="card-title">Sécurité du compte</div>
+        <div class="card-sub">
+          Gérez la sécurité de votre compte
+        </div>
+      </div>
+
+      <!-- Info session -->
+      <div class="security-info">
+        <div class="security-row">
+          <div class="security-left">
+            <div class="security-icon">🔑</div>
+            <div>
+              <div class="security-title">
+                Session active
+              </div>
+              <div class="security-desc">
+                Connecté via Keycloak
+              </div>
+            </div>
+          </div>
+          <div class="security-status active">
+            ● Active
+          </div>
+        </div>
+
+        <div class="security-row">
+          <div class="security-left">
+            <div class="security-icon">🛡️</div>
+            <div>
+              <div class="security-title">
+                Authentification
+              </div>
+              <div class="security-desc">
+                OAuth2 / JWT Token
+              </div>
+            </div>
+          </div>
+          <div class="security-status active">
+            ● Sécurisé
+          </div>
+        </div>
+
+        <div class="security-row">
+          <div class="security-left">
+            <div class="security-icon">👤</div>
+            <div>
+              <div class="security-title">
+                Identifiant Keycloak
+              </div>
+              <div class="security-desc mono">
+                {{ user?.keycloakId | slice:0:18 }}...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Déconnexion -->
+      <div class="danger-zone">
+        <div class="danger-title">⚠️ Zone dangereuse</div>
+        <div class="danger-row">
+          <div>
+            <div class="danger-action-title">
+              Déconnexion
+            </div>
+            <div class="danger-action-desc">
+              Terminer votre session actuelle
+            </div>
+          </div>
+          <a routerLink="/login"
+             class="btn-logout"
+             (click)="logout()">
+            🚪 Se déconnecter
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

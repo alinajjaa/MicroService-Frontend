@@ -1,0 +1,87 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+
+  <!-- Toggle Button -->
+  <button class="toggle-btn" (click)="collapsed = !collapsed"
+          [title]="collapsed ? 'Ouvrir' : 'Réduire'">
+    <svg width="16" height="16" viewBox="0 0 16 16"
+         [class.flipped]="collapsed">
+      <path d="M10 3L5 8l5 5" stroke="currentColor"
+            stroke-width="1.5" fill="none"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="brand-icon">🌿</div>
+    <div class="brand-info" *ngIf="!collapsed">
+      <span class="brand-title">Admin</span>
+      <span class="brand-desc">Wellbeing Panel</span>
+    </div>
+  </div>
+
+  <!-- User card -->
+  <div class="user-card" *ngIf="!collapsed">
+    <div class="uc-avatar">
+      {{ user?.firstName?.charAt(0) }}{{ user?.lastName?.charAt(0) }}
+    </div>
+    <div class="uc-info">
+      <div class="uc-name">
+        {{ user?.firstName }} {{ user?.lastName }}
+      </div>
+      <div class="uc-role">{{ user?.role }}</div>
+    </div>
+    <div class="uc-status"></div>
+  </div>
+  <div class="user-avatar-mini" *ngIf="collapsed"
+       [title]="user?.firstName">
+    {{ user?.firstName?.charAt(0) }}{{ user?.lastName?.charAt(0) }}
+  </div>
+
+  <!-- Nav label -->
+  <div class="nav-section-label" *ngIf="!collapsed">
+    Navigation
+  </div>
+
+  <!-- Menu -->
+  <nav class="sidebar-nav">
+    <a *ngFor="let item of menuItems; let i = index"
+       [routerLink]="item.path"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{exact: item.exact || false}"
+       class="nav-item"
+       [title]="collapsed ? item.label : ''"
+       [style.animation-delay]="i * 0.04 + 's'">
+      <span class="nav-icon">{{ item.icon }}</span>
+      <span class="nav-label" *ngIf="!collapsed">
+        {{ item.label }}
+      </span>
+      <span class="nav-badge" *ngIf="!collapsed"></span>
+    </a>
+  </nav>
+
+  <!-- Spacer -->
+  <div class="spacer"></div>
+
+  <!-- Footer actions -->
+  <div class="sidebar-footer">
+    <div class="footer-divider" *ngIf="!collapsed"></div>
+    <button class="nav-item footer-item"
+            (click)="goToFrontoffice()"
+            [title]="collapsed ? 'Frontoffice' : ''">
+      <span class="nav-icon">🌐</span>
+      <span class="nav-label" *ngIf="!collapsed">
+        Frontoffice
+      </span>
+    </button>
+    <button class="nav-item footer-item logout-item"
+            (click)="logout()"
+            [title]="collapsed ? 'Déconnexion' : ''">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-label" *ngIf="!collapsed">
+        Déconnexion
+      </span>
+    </button>
+  </div>
+
+</aside>

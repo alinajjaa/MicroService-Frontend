@@ -1,0 +1,171 @@
+<div class="form-container">
+
+  <!-- Header -->
+  <div class="form-header">
+    <button class="btn-back" (click)="cancel()">
+      ← Retour
+    </button>
+    <div>
+      <h3 class="form-title">
+        {{ isEdit ? '✏️ Modifier la séance'
+                  : '➕ Nouvelle séance de méditation' }}
+      </h3>
+      <p class="form-sub">
+        {{ isEdit ? 'Modifiez les informations'
+                  : 'Créez une nouvelle séance guidée' }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert-bar alert-error">
+    ❌ {{ error }}
+  </div>
+
+  <!-- Form -->
+  <div *ngIf="!loading" class="form-card">
+    <form [formGroup]="form" (ngSubmit)="save()">
+
+      <!-- Titre -->
+      <div class="field-group">
+        <label class="field-label">
+          📝 Titre de la séance *
+        </label>
+        <input type="text"
+               class="field-input"
+               formControlName="title"
+               placeholder="Ex: Méditation du matin">
+        <span class="field-error"
+              *ngIf="f['title'].touched &&
+                     f['title'].errors?.['required']">
+          Le titre est obligatoire
+        </span>
+        <span class="field-error"
+              *ngIf="f['title'].touched &&
+                     f['title'].errors?.['minlength']">
+          Minimum 3 caractères
+        </span>
+      </div>
+
+      <!-- Description -->
+      <div class="field-group">
+        <label class="field-label">
+          📄 Description *
+        </label>
+        <textarea class="field-input"
+                  formControlName="description"
+                  rows="3"
+                  placeholder="Décrivez le but de cette séance...">
+        </textarea>
+        <span class="field-error"
+              *ngIf="f['description'].touched &&
+                     f['description'].errors?.['required']">
+          La description est obligatoire
+        </span>
+      </div>
+
+      <!-- Catégorie -->
+      <div class="field-group">
+        <label class="field-label">
+          🏷️ Catégorie *
+        </label>
+        <div class="category-grid">
+          <button type="button"
+                  *ngFor="let cat of categories"
+                  class="category-btn"
+                  [class.active]="
+                    form.value.category === cat.value"
+                  (click)="form.patchValue({
+                    category: cat.value})">
+            {{ cat.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Durée -->
+      <div class="field-group">
+        <label class="field-label">
+          ⏱️ Durée : {{ form.value.duration }} minutes
+        </label>
+        <input type="range"
+               class="range-input"
+               formControlName="duration"
+               min="1" max="120" step="5">
+        <div class="range-labels">
+          <span>1 min</span>
+          <span>30 min</span>
+          <span>60 min</span>
+          <span>120 min</span>
+        </div>
+        <div class="duration-chips">
+          <button type="button"
+                  class="chip"
+                  *ngFor="let d of [5,10,15,20,30,45,60]"
+                  [class.active]="form.value.duration === d"
+                  (click)="form.patchValue({duration: d})">
+            {{ d }} min
+          </button>
+        </div>
+      </div>
+
+      <!-- Image URL -->
+      <div class="field-group">
+        <label class="field-label">
+          🖼️ Image URL (optionnel)
+        </label>
+        <input type="url"
+               class="field-input"
+               formControlName="imageUrl"
+               placeholder="https://example.com/image.jpg">
+        <!-- Preview -->
+        <div class="image-preview"
+             *ngIf="form.value.imageUrl">
+          <img [src]="form.value.imageUrl"
+               alt="Preview"
+               (error)="form.patchValue({imageUrl: ''})">
+        </div>
+      </div>
+
+      <!-- Active -->
+      <div class="field-group">
+        <label class="toggle-label">
+          <div class="toggle-wrap">
+            <input type="checkbox"
+                   formControlName="isActive"
+                   class="toggle-input">
+            <span class="toggle-slider"></span>
+          </div>
+          <span>
+            {{ form.value.isActive ?
+              '✅ Séance active (visible par les users)' :
+              '❌ Séance inactive (masquée)' }}
+          </span>
+        </label>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button"
+                class="btn-cancel"
+                (click)="cancel()">
+          Annuler
+        </button>
+        <button type="submit"
+                class="btn-save"
+                [disabled]="form.invalid || saving">
+          {{ saving ? '⏳ Enregistrement...'
+                    : (isEdit ? '💾 Mettre à jour'
+                              : '✅ Créer la séance') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

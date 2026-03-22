@@ -1,0 +1,141 @@
+<div class="form-container">
+
+  <!-- Header -->
+  <div class="form-header">
+    <button class="btn-back" (click)="cancel()">
+      ← Retour
+    </button>
+    <div>
+      <h3 class="form-title">📢 Nouvelle réclamation</h3>
+      <p class="form-sub">
+        Décrivez votre problème, nous vous répondrons
+        dans les plus brefs délais
+      </p>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert-error">❌ {{ error }}</div>
+
+  <div class="form-card">
+
+    <!-- Étape 1 — Sujet -->
+    <div class="form-section">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Choisissez un sujet</div>
+          <div class="step-sub">
+            Sélectionnez la catégorie de votre réclamation
+          </div>
+        </div>
+      </div>
+
+      <div class="subjects-grid">
+        <button *ngFor="let s of subjects"
+                type="button"
+                class="subject-btn"
+                [class.selected]="selectedSubject === s.value"
+                (click)="selectSubject(s.value)">
+          <span class="subject-icon">{{ s.icon }}</span>
+          <span class="subject-label">{{ s.value }}</span>
+        </button>
+      </div>
+
+      <!-- Champ texte si "Autre" -->
+      <div class="form-group mt-3" *ngIf="customSubject">
+        <label>Précisez le sujet *</label>
+        <input type="text"
+               class="form-input"
+               [formControl]="$any(form.get('subject'))"
+               placeholder="Décrivez votre sujet...">
+      </div>
+    </div>
+
+    <!-- Étape 2 — Description -->
+    <div class="form-section">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Décrivez votre problème</div>
+          <div class="step-sub">
+            Minimum 20 caractères, maximum 500
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-group">
+          <textarea class="form-input"
+                    formControlName="description"
+                    rows="5"
+                    placeholder="Expliquez votre problème en détail : quand cela s'est-il produit, que s'est-il passé, qu'attendez-vous comme résolution ?"
+                    [class.invalid]="
+                      form.get('description')?.invalid &&
+                      form.get('description')?.touched">
+          </textarea>
+
+          <!-- Barre de progression -->
+          <div class="desc-footer">
+            <span class="error-msg"
+                  *ngIf="form.get('description')?.invalid &&
+                         form.get('description')?.touched">
+              Minimum 20 caractères requis
+            </span>
+            <span class="char-count"
+                  [class.warn]="descLength > 450"
+                  [class.limit]="descLength >= 500">
+              {{ descLength }}/500
+            </span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill"
+                 [style.width.%]="descProgress"
+                 [class.warn]="descLength > 450"
+                 [class.limit]="descLength >= 500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Récapitulatif -->
+        <div class="recap-card"
+             *ngIf="form.get('subject')?.value &&
+                    descLength >= 20">
+          <div class="recap-title">✅ Récapitulatif</div>
+          <div class="recap-row">
+            <span class="recap-label">Sujet :</span>
+            <span class="recap-value">
+              {{ form.get('subject')?.value }}
+            </span>
+          </div>
+          <div class="recap-row">
+            <span class="recap-label">Description :</span>
+            <span class="recap-value desc-preview">
+              {{ form.get('description')?.value | slice:0:80 }}
+              {{ descLength > 80 ? '...' : '' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button"
+                  class="btn-cancel"
+                  (click)="cancel()">
+            Annuler
+          </button>
+          <button type="submit"
+                  class="btn-submit"
+                  [disabled]="form.invalid || saving">
+            <span *ngIf="saving" class="spinner-sm"></span>
+            {{ saving ? 'Envoi en cours...'
+                      : '📤 Soumettre la réclamation' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+
+</div>

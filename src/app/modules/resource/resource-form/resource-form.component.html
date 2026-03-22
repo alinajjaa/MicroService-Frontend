@@ -1,0 +1,131 @@
+<div class="form-container">
+
+  <div class="form-header">
+    <button class="btn-back" (click)="cancel()">← Retour</button>
+    <div>
+      <h3 class="form-title">
+        {{ isEdit ? '✏️ Modifier la ressource'
+                  : '➕ Nouvelle ressource' }}
+      </h3>
+      <p class="form-sub">
+        Ajoutez du contenu bien-être pour vos utilisateurs
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+  </div>
+
+  <div *ngIf="error" class="alert-bar alert-error">
+    ❌ {{ error }}
+  </div>
+
+  <div class="form-card" *ngIf="!loading">
+    <form [formGroup]="form" (ngSubmit)="save()">
+
+      <!-- Infos générales -->
+      <div class="form-section">
+        <h6 class="section-title">Informations générales</h6>
+
+        <div class="form-group">
+          <label>Titre *</label>
+          <input type="text" class="form-input"
+                 formControlName="title"
+                 placeholder="Titre de la ressource"
+                 [class.invalid]="form.get('title')?.invalid
+                   && form.get('title')?.touched">
+        </div>
+
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea class="form-input"
+                    formControlName="description"
+                    rows="3"
+                    placeholder="Décrivez cette ressource...">
+          </textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Type *</label>
+            <select class="form-input" formControlName="type">
+              <option *ngFor="let t of types" [value]="t.value">
+                {{ t.icon }} {{ t.label }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Catégorie *</label>
+<select class="form-input" formControlName="category">
+  <option *ngFor="let cat of categories"
+          [value]="cat.value">
+    {{ cat.label }}
+  </option>
+</select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liens -->
+      <div class="form-section">
+        <h6 class="section-title">Liens</h6>
+
+        <div class="form-group">
+          <label>URL de la ressource *</label>
+          <input type="url" class="form-input"
+                 formControlName="url"
+                 placeholder="https://..."
+                 [class.invalid]="form.get('url')?.invalid
+                   && form.get('url')?.touched">
+          <span class="error-msg"
+                *ngIf="form.get('url')?.invalid
+                    && form.get('url')?.touched">
+            URL valide requise (https://...)
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label>Image de couverture (optionnel)</label>
+<input formControlName="thumbnailUrl"
+       type="url"
+       class="form-input"
+       placeholder="https://...">
+        </div>
+      </div>
+
+      <!-- Aperçu -->
+      <div class="preview-card">
+        <div class="preview-label">Aperçu type</div>
+        <div class="preview-content">
+          <span>{{ getTypeIcon(form.get('type')?.value) }}</span>
+          <span class="preview-type">
+            {{ form.get('type')?.value }}
+          </span>
+          <span class="preview-sep">—</span>
+          <span class="preview-cat">
+            {{ form.get('category')?.value }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button"
+                class="btn-cancel" (click)="cancel()">
+          Annuler
+        </button>
+        <button type="submit"
+                class="btn-save"
+                [disabled]="form.invalid || saving">
+          <span *ngIf="saving" class="spinner-sm"></span>
+          {{ saving ? 'Enregistrement...'
+                    : (isEdit ? '💾 Mettre à jour'
+                              : '✅ Créer') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

@@ -1,0 +1,17 @@
+frontend:
+    build:
+      context: ../wellbeing-frontend
+      dockerfile: Dockerfile
+    container_name: wellbeing-frontend
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - wellbeing-net
+
+
+
+
+      

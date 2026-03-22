@@ -1,0 +1,78 @@
+<div class="admin-dashboard">
+
+  <!-- ─── Welcome Banner ─── -->
+  <div class="welcome-banner">
+    <div class="banner-content">
+      <div class="banner-greeting">
+        <div class="greeting-badge">⚙️ Administration</div>
+        <h2 class="greeting-title">
+          Bonjour, {{ user?.firstName }} 👋
+        </h2>
+        <p class="greeting-sub">
+          {{ today | date:'EEEE d MMMM yyyy':'':'fr' }}
+          — Vue d'ensemble de votre application
+        </p>
+      </div>
+      <div class="banner-visual">
+        <div class="visual-ring ring-1"></div>
+        <div class="visual-ring ring-2"></div>
+        <div class="visual-ring ring-3"></div>
+        <span class="visual-icon">🌿</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Stats Grid ─── -->
+  <div class="stats-section">
+    <div class="section-label">Vue d'ensemble</div>
+    <div class="stats-grid">
+      <a *ngFor="let stat of stats; let i = index"
+         [routerLink]="stat.path"
+         class="stat-card"
+         [style.animation-delay]="i * 0.08 + 's'">
+        <div class="stat-card-inner">
+          <div class="stat-icon-wrap"
+               [style.background]="stat.iconBg">
+            <span class="stat-icon">{{ stat.icon }}</span>
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+          <div class="stat-trend" *ngIf="stat.trend">
+            <span class="trend-arrow">↑</span>
+            {{ stat.trend }}
+          </div>
+        </div>
+        <div class="stat-bar">
+          <div class="stat-bar-fill"
+               [style.width]="stat.percent"
+               [style.background]="stat.barColor">
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ─── Quick Actions ─── -->
+  <div class="actions-section">
+    <div class="section-label">Actions rapides</div>
+    <div class="actions-grid">
+      <a *ngFor="let action of quickActions; let i = index"
+         [routerLink]="action.path"
+         class="action-card"
+         [style.animation-delay]="(i * 0.07 + 0.4) + 's'">
+        <div class="action-icon-wrap"
+             [style.background]="action.bg">
+          <span class="action-icon">{{ action.icon }}</span>
+        </div>
+        <div class="action-info">
+          <div class="action-title">{{ action.title }}</div>
+          <div class="action-desc">{{ action.desc }}</div>
+        </div>
+        <div class="action-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+</div>

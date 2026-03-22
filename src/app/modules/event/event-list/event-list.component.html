@@ -1,0 +1,443 @@
+<div class="events-container">
+
+  <!-- Header -->
+  <div class="events-header">
+    <div>
+      <h3 class="page-title">
+        {{ isAdmin ? 'Gestion des événements 📅'
+        : 'Événements bien-être 📅' }}
+      </h3>
+      <p class="page-sub">
+        {{ filteredEvents.length }} événement(s)
+      </p>
+    </div>
+    <button *ngIf="isAdmin" class="btn-create" (click)="goToCreate()">
+      + Créer un événement
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="error" class="alert-bar alert-error">❌ {{ error }}</div>
+  <div *ngIf="success" class="alert-bar alert-success">✅ {{ success }}</div>
+
+  <!-- Tabs USER -->
+  <div class="tabs-row" *ngIf="!isAdmin">
+    <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="setTab('all')">
+      🌐 Tous les événements
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'mine'" (click)="setTab('mine')">
+      📌 Mes inscriptions
+      <span class="tab-badge" *ngIf="myEvents.length > 0">
+        {{ myEvents.length }}
+      </span>
+    </button>
+  </div>
+
+  <!-- Filters -->
+<!-- Filters -->
+<div class="filters-section">
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <span>🔍</span>
+    <input type="text"
+           [(ngModel)]="searchTerm"
+           (ngModelChange)="applyFilters()"
+           placeholder="Rechercher un événement..."
+           class="search-input">
+  </div>
+
+  <div class="filter-divider"></div>
+
+  <!-- Catégories -->
+  <div class="filter-group">
+    <div class="filter-label">📂 Catégorie</div>
+    <div class="filter-chips">
+      <button class="chip"
+              [class.active]="!selectedCategory"
+              (click)="selectedCategory='';
+                       applyFilters()">
+        Toutes
+      </button>
+      <button *ngFor="let cat of categories"
+              class="chip"
+              [class.active]="
+                selectedCategory === cat.value"
+              (click)="selectedCategory = cat.value;
+                       applyFilters()">
+        {{ cat.icon }} {{ cat.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Statuts — ADMIN seulement -->
+  <div class="filter-group" *ngIf="isAdmin">
+    <div class="filter-divider"></div>
+    <div class="filter-label">📊 Statut</div>
+    <div class="filter-chips">
+      <button class="chip"
+              [class.active]="!selectedStatus"
+              (click)="selectedStatus='';
+                       applyFilters()">
+        Tous
+      </button>
+      <button *ngFor="let s of statuses"
+              class="chip"
+              [class.active]="
+                selectedStatus === s.value"
+              (click)="selectedStatus = s.value;
+                       applyFilters()">
+        {{ s.icon }} {{ s.label }}
+      </button>
+    </div>
+  </div>
+
+</div>
+
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && filteredEvents.length === 0" class="empty-state">
+    <div class="empty-icon">📅</div>
+    <h5>Aucun événement trouvé</h5>
+    <p>{{ activeTab === 'mine'
+      ? 'Vous n\'êtes inscrit à aucun événement'
+      : 'Modifiez vos filtres' }}</p>
+  </div>
+
+  <!-- Events Grid -->
+  <div class="events-grid" *ngIf="!loading && filteredEvents.length > 0">
+    <div class="event-card" *ngFor="let event of filteredEvents">
+
+      <!-- Image -->
+      <div class="event-image" [style.backgroundImage]="event.imageUrl ?
+             'url('+event.imageUrl+')' : 'none'">
+        <div class="event-placeholder" *ngIf="!event.imageUrl">
+          {{ getCategoryInfo(event.category).icon }}
+        </div>
+
+        <!-- Status badge -->
+        <div class="status-badge" [style.background]="
+               getStatusInfo(event.status).color" [style.color]="
+               getStatusInfo(event.status).text">
+          {{ getStatusInfo(event.status).icon }}
+          {{ getStatusInfo(event.status).label }}
+        </div>
+
+        <!-- Inscrit badge -->
+        <div class="registered-badge" *ngIf="event.userIsRegistered &&
+                    !isAdmin">
+          ✓ Inscrit
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="event-content">
+
+        <!-- Meta -->
+        <div class="event-meta">
+          <span class="event-category">
+            {{ getCategoryInfo(event.category).icon }}
+            {{ getCategoryInfo(event.category).label }}
+          </span>
+          <span class="event-date">
+            📅 {{ event.eventDate | date:'dd MMM yyyy' }}
+          </span>
+        </div>
+
+        <h5 class="event-title">{{ event.title }}</h5>
+        <p class="event-desc">{{ event.description }}</p>
+        <div class="event-location">
+          📍 {{ event.location }}
+        </div>
+
+        <!-- Rating -->
+        <div class="event-rating" *ngIf="event.totalRatings > 0">
+          <span *ngFor="let s of getStars(event.averageRating)">
+            {{ s }}
+          </span>
+          <span class="rating-count">
+            {{ event.averageRating }}/5
+            ({{ event.totalRatings }})
+          </span>
+        </div>
+
+        <!-- Participants -->
+        <div class="participants-section">
+          <div class="participants-header">
+            <span class="part-label">Participants</span>
+            <span class="part-count" [class.full]="event.isFull">
+              {{ event.currentParticipants }}/
+              {{ event.maxParticipants }}
+              <span *ngIf="!event.isFull" class="places-left">
+                ({{ event.availablePlaces }} place{{
+                event.availablePlaces > 1 ? 's' : ''
+                }} restante{{
+                event.availablePlaces > 1 ? 's' : ''
+                }})
+              </span>
+            </span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="
+                   (event.currentParticipants /
+                    event.maxParticipants) * 100" [style.background]="
+                   getProgressColor(event)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions USER -->
+        <div class="event-actions" *ngIf="!isAdmin">
+
+          <!-- S'inscrire -->
+          <button *ngIf="!event.userIsRegistered &&
+                         event.status === 'UPCOMING' &&
+                         !event.isFull" class="btn-register" (click)="register(event)">
+            ✅ S'inscrire
+          </button>
+
+          <!-- Se désinscrire -->
+          <button *ngIf="event.userIsRegistered &&
+                         event.status === 'UPCOMING'" class="btn-unregister" (click)="unregister(event)">
+            ❌ Se désinscrire
+          </button>
+
+          <!-- Complet -->
+          <span *ngIf="event.isFull &&
+                       !event.userIsRegistered" class="badge-full">
+            🔴 Complet
+          </span>
+
+          <!-- En cours -->
+          <span *ngIf="event.status === 'ONGOING' &&
+                       event.userIsRegistered" class="badge-ongoing">
+            🔵 En cours
+          </span>
+
+          <!-- Noter -->
+          <button *ngIf="event.status === 'COMPLETED' &&
+                         event.userIsRegistered" class="btn-rate" (click)="openRating(event)">
+            ⭐ Noter
+          </button>
+
+          <!-- Voir détail -->
+          <button class="btn-detail" (click)="openDetail(event)">
+            Voir plus →
+          </button>
+        </div>
+
+        <!-- ✅ Actions ADMIN — Fix status + bouton participants -->
+<!-- Actions ADMIN -->
+<div class="admin-actions-bar" *ngIf="isAdmin">
+
+  <!-- Status selector stylisé -->
+  <div class="status-selector-wrap">
+    <select class="status-select-modern"
+            [(ngModel)]="eventStatusMap[event.id]"
+            (ngModelChange)="onStatusChange(event, $event)"
+            [class.status-upcoming]="
+              eventStatusMap[event.id] === 'UPCOMING'"
+            [class.status-ongoing]="
+              eventStatusMap[event.id] === 'ONGOING'"
+            [class.status-completed]="
+              eventStatusMap[event.id] === 'COMPLETED'"
+            [class.status-cancelled]="
+              eventStatusMap[event.id] === 'CANCELLED'">
+      <option *ngFor="let s of adminStatuses"
+              [value]="s.value">
+        {{ s.label }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Boutons actions -->
+  <div class="admin-btns">
+
+    <!-- Participants -->
+    <button class="admin-btn participants-btn"
+            (click)="openParticipants(event)"
+            title="Voir les participants">
+      <span class="btn-icon">👥</span>
+      <span class="btn-count">
+        {{ event.currentParticipants }}
+      </span>
+    </button>
+
+    <!-- Modifier -->
+    <button class="admin-btn edit-btn"
+            (click)="goToEdit(event.id)"
+            title="Modifier l'événement">
+      <span class="btn-icon">✏️</span>
+      <span class="btn-text">Modifier</span>
+    </button>
+
+    <!-- Supprimer -->
+    <button class="admin-btn delete-btn"
+            (click)="deleteEvent(event.id)"
+            title="Supprimer l'événement">
+      <span class="btn-icon">🗑️</span>
+      <span class="btn-text">Supprimer</span>
+    </button>
+
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Modal Rating -->
+  <div class="modal-overlay" *ngIf="showRating" (click)="showRating=false">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5>⭐ Noter l'événement</h5>
+        <button (click)="showRating=false" class="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-event-name">
+          {{ ratingEvent?.title }}
+        </p>
+
+        <!-- Étoiles cliquables -->
+        <div class="stars-selector">
+          <button *ngFor="let s of [1,2,3,4,5]" class="star-btn" [class.active]="ratingValue >= s"
+            (click)="ratingValue = s">
+            ★
+          </button>
+        </div>
+        <div class="rating-label">
+          {{ ratingValue }}/5 —
+          {{ ratingValue === 1 ? 'Très mauvais' :
+          ratingValue === 2 ? 'Mauvais' :
+          ratingValue === 3 ? 'Moyen' :
+          ratingValue === 4 ? 'Bien' : 'Excellent' }}
+        </div>
+
+        <textarea class="form-input mt-2" [(ngModel)]="ratingComment" rows="3"
+          placeholder="Votre commentaire (optionnel)...">
+        </textarea>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="showRating=false">
+            Annuler
+          </button>
+          <button class="btn-save" (click)="submitRating()">
+            ⭐ Envoyer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Modal Détail -->
+  <div class="modal-overlay" *ngIf="showDetail && detailEvent" (click)="showDetail=false">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5>📅 {{ detailEvent.title }}</h5>
+        <button (click)="showDetail=false" class="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-row">
+          <span class="detail-label">📍 Lieu</span>
+          <span>{{ detailEvent.location }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">📅 Date</span>
+          <span>
+            {{ detailEvent.eventDate
+            | date:'dd MMMM yyyy' }}
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">👥 Places</span>
+          <span>
+            {{ detailEvent.currentParticipants }}/
+            {{ detailEvent.maxParticipants }}
+            ({{ detailEvent.availablePlaces }} restantes)
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">📊 Statut</span>
+          <span>
+            {{ getStatusInfo(detailEvent.status).icon }}
+            {{ getStatusInfo(detailEvent.status).label }}
+          </span>
+        </div>
+        <div class="detail-row" *ngIf="detailEvent.totalRatings > 0">
+          <span class="detail-label">⭐ Note</span>
+          <span>
+            {{ detailEvent.averageRating }}/5
+            ({{ detailEvent.totalRatings }} avis)
+          </span>
+        </div>
+        <div class="detail-desc">
+          {{ detailEvent.description }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ✅ Modal Participants -->
+  <div class="modal-overlay" *ngIf="showParticipants && participantsEvent" (click)="showParticipants=false">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5>
+          👥 Participants — {{ participantsEvent.title }}
+        </h5>
+        <button (click)="showParticipants=false" class="modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Loading -->
+        <div *ngIf="loadingParticipants" class="loading-state">
+          <div class="spinner"></div>
+        </div>
+
+        <!-- Vide -->
+        <div *ngIf="!loadingParticipants &&
+                  participantsList.length === 0" class="empty-state">
+          <p>Aucun participant inscrit</p>
+        </div>
+
+        <!-- Liste participants -->
+        <div class="participants-list" *ngIf="!loadingParticipants &&
+                  participantsList.length > 0">
+          <div class="participant-item" *ngFor="let p of participantsList">
+            <div class="participant-avatar">
+              {{ p.firstName?.charAt(0) }}{{
+              p.lastName?.charAt(0) }}
+            </div>
+            <div class="participant-info">
+              <div class="participant-name">
+                {{ p.firstName }} {{ p.lastName }}
+              </div>
+              <div class="participant-email">
+                {{ p.email }}
+              </div>
+            </div>
+            <div class="participant-role">
+              {{ p.role }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Total -->
+        <div class="participants-footer" *ngIf="!loadingParticipants">
+          <span>
+            Total : {{ participantsEvent.currentParticipants }}/
+            {{ participantsEvent.maxParticipants }} participants
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,108 @@
+<div class="auth-wrapper">
+  <div class="auth-left">
+    <div class="left-bg"></div>
+    <div class="left-content">
+      <div class="brand">
+        <div class="brand-logo">🌿</div>
+        <span class="brand-name">Wellbeing</span>
+      </div>
+      <div class="hero">
+        <h1>Votre espace<br><span class="accent">bien-être</span></h1>
+        <p>Suivez vos émotions, méditez, et connectez-vous avec des experts.</p>
+      </div>
+      <div class="feat-list">
+        <div class="feat-item">
+          <div class="feat-dot"></div>
+          <span>Suivi d'humeur quotidien</span>
+        </div>
+        <div class="feat-item">
+          <div class="feat-dot"></div>
+          <span>Méditations guidées</span>
+        </div>
+        <div class="feat-item">
+          <div class="feat-dot"></div>
+          <span>Chat avec des experts</span>
+        </div>
+        <div class="feat-item">
+          <div class="feat-dot"></div>
+          <span>Ressources bien-être</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="form-box">
+
+      <div class="form-header">
+        <div class="welcome-pill">👋 Bon retour !</div>
+        <h2>Connectez-vous</h2>
+        <p>Entrez vos identifiants pour accéder à votre espace</p>
+      </div>
+
+      <div class="alert-box" *ngIf="error">
+        <span>⚠️</span> {{ error }}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <div class="field"
+             [class.has-error]="form.get('email')?.invalid
+                              && form.get('email')?.touched">
+          <label>Adresse email</label>
+          <div class="input-row"
+               [class.focused]="emailFocused">
+            <span class="ico">📧</span>
+            <input type="email"
+                   formControlName="email"
+                   placeholder="vous@email.com"
+                   (focus)="emailFocused=true"
+                   (blur)="emailFocused=false">
+          </div>
+          <span class="err-msg">Adresse email invalide</span>
+        </div>
+
+        <div class="field"
+             [class.has-error]="form.get('password')?.invalid
+                              && form.get('password')?.touched">
+          <label>Mot de passe</label>
+          <div class="input-row"
+               [class.focused]="passFocused">
+            <span class="ico">🔒</span>
+            <input [type]="showPass ? 'text' : 'password'"
+                   formControlName="password"
+                   placeholder="••••••••"
+                   (focus)="passFocused=true"
+                   (blur)="passFocused=false">
+            <button type="button"
+                    class="eye-btn"
+                    (click)="showPass=!showPass">
+              {{ showPass ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          <span class="err-msg">Mot de passe requis</span>
+        </div>
+
+        <button type="submit"
+                class="submit-btn"
+                [disabled]="form.invalid || loading">
+          <span class="spinner-border spinner-border-sm"
+                *ngIf="loading"></span>
+          <span>{{ loading ? 'Connexion...' : 'Se connecter' }}</span>
+          <span class="arr" *ngIf="!loading">→</span>
+        </button>
+
+      </form>
+
+      <div class="divider">
+        <span></span><p>ou</p><span></span>
+      </div>
+
+      <div class="bottom-link">
+        Pas de compte ?
+        <a routerLink="/register">Créer un compte gratuit</a>
+      </div>
+
+    </div>
+  </div>
+</div>

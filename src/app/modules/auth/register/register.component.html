@@ -1,0 +1,179 @@
+<div class="auth-wrapper">
+  <div class="auth-left">
+    <div class="left-bg"></div>
+    <div class="left-content">
+      <div class="brand">
+        <div class="brand-logo">🌿</div>
+        <span class="brand-name">Wellbeing</span>
+      </div>
+      <div class="hero">
+        <h1>Rejoignez<br><span class="accent">la communauté</span></h1>
+        <p>Créez votre compte et commencez votre voyage vers le bien-être.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num active">1</div>
+          <div class="step-body">
+            <div class="step-title">Créez votre compte</div>
+            <div class="step-sub">Quelques infos suffisent</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Personnalisez</div>
+            <div class="step-sub">Adaptez à vos besoins</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Commencez !</div>
+            <div class="step-sub">Votre bien-être vous attend</div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-n">10k+</div>
+          <div class="stat-l">Membres</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <div class="stat-n">4.9★</div>
+          <div class="stat-l">Note</div>
+        </div>
+        <div class="stat-sep"></div>
+        <div class="stat-item">
+          <div class="stat-n">100%</div>
+          <div class="stat-l">Gratuit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="form-box">
+
+      <div class="form-header">
+        <div class="welcome-pill">✨ Bienvenue !</div>
+        <h2>Créer un compte</h2>
+        <p>Rejoignez Wellbeing en quelques secondes</p>
+      </div>
+
+      <div class="alert-box alert-err" *ngIf="error">
+        <span>⚠️</span> {{ error }}
+      </div>
+      <div class="alert-box alert-ok" *ngIf="success">
+        <span>✅</span> {{ success }}
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <div class="row2">
+          <div class="field"
+               [class.has-error]="form.get('firstName')?.invalid
+                                && form.get('firstName')?.touched">
+            <label>Prénom</label>
+            <div class="input-row">
+              <span class="ico">👤</span>
+              <input type="text"
+                     formControlName="firstName"
+                     placeholder="Alice">
+            </div>
+            <span class="err-msg">Requis</span>
+          </div>
+          <div class="field"
+               [class.has-error]="form.get('lastName')?.invalid
+                                && form.get('lastName')?.touched">
+            <label>Nom</label>
+            <div class="input-row">
+              <span class="ico">👤</span>
+              <input type="text"
+                     formControlName="lastName"
+                     placeholder="Martin">
+            </div>
+            <span class="err-msg">Requis</span>
+          </div>
+        </div>
+
+        <div class="field"
+             [class.has-error]="form.get('email')?.invalid
+                              && form.get('email')?.touched">
+          <label>Email</label>
+          <div class="input-row">
+            <span class="ico">📧</span>
+            <input type="email"
+                   formControlName="email"
+                   placeholder="alice@email.com">
+          </div>
+          <span class="err-msg">Email invalide</span>
+        </div>
+
+        <div class="field"
+             [class.has-error]="form.get('phone')?.invalid
+                              && form.get('phone')?.touched">
+          <label>Téléphone</label>
+          <div class="input-row">
+            <span class="ico">📱</span>
+            <input type="tel"
+                   formControlName="phone"
+                   placeholder="0612345678">
+          </div>
+          <span class="err-msg">Requis</span>
+        </div>
+
+        <div class="field"
+             [class.has-error]="form.get('password')?.invalid
+                              && form.get('password')?.touched">
+          <label>Mot de passe</label>
+          <div class="input-row">
+            <span class="ico">🔒</span>
+            <input [type]="showPass ? 'text' : 'password'"
+                   formControlName="password"
+                   placeholder="Minimum 6 caractères"
+                   (input)="checkStrength()">
+            <button type="button"
+                    class="eye-btn"
+                    (click)="showPass=!showPass">
+              {{ showPass ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          <div class="strength-bars"
+               *ngIf="form.get('password')?.value">
+            <div class="sbar"
+                 [class.weak]="strength==='weak'"
+                 [class.med]="strength==='medium'||strength==='strong'"
+                 [class.strong]="strength==='strong'"></div>
+            <div class="sbar"
+                 [class.med]="strength==='medium'"
+                 [class.strong]="strength==='strong'"></div>
+            <div class="sbar"
+                 [class.strong]="strength==='strong'"></div>
+          </div>
+          <span class="err-msg">Minimum 6 caractères</span>
+        </div>
+
+        <button type="submit"
+                class="submit-btn"
+                [disabled]="form.invalid || loading">
+          <span class="spinner-border spinner-border-sm"
+                *ngIf="loading"></span>
+          <span>{{ loading ? 'Création...' : 'Créer mon compte' }}</span>
+          <span class="arr" *ngIf="!loading">→</span>
+        </button>
+
+      </form>
+
+      <div class="divider">
+        <span></span><p>ou</p><span></span>
+      </div>
+
+      <div class="bottom-link">
+        Déjà un compte ?
+        <a routerLink="/login">Se connecter</a>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,224 @@
+.form-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.form-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-back {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1.5px solid #e9ecef;
+  border-radius: 10px;
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  margin-top: 4px;
+
+  &:hover {
+    border-color: #2d6a4f;
+    color: #2d6a4f;
+  }
+}
+
+.form-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.25rem;
+}
+
+.form-sub {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.form-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+
+.form-section {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-of-type { border-bottom: none; }
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #2d6a4f;
+  margin: 0 0 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+
+  label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+  }
+}
+
+.form-input {
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  background: #fafafa;
+
+  &:focus {
+    border-color: #2d6a4f;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(45,106,79,0.08);
+  }
+
+  &.invalid {
+    border-color: #dc3545;
+  }
+}
+
+textarea.form-input { resize: vertical; }
+
+.error-msg {
+  font-size: 0.75rem;
+  color: #dc3545;
+}
+
+.preview-card {
+  margin: 0 1.5rem 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(45,106,79,0.05);
+  border-radius: 12px;
+  border: 1.5px dashed rgba(45,106,79,0.2);
+}
+
+.preview-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6c9e84;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.4rem;
+}
+
+.preview-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.preview-cat {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d6a4f;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-cancel {
+  padding: 0.65rem 1.25rem;
+  background: white;
+  border: 1.5px solid #e9ecef;
+  border-radius: 10px;
+  color: #6c757d;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover { border-color: #adb5bd; }
+}
+
+.btn-save {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  background: linear-gradient(135deg, #1a472a, #2d6a4f);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26,71,42,0.3);
+  }
+
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.spinner-sm {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid #e9ecef;
+    border-top-color: #2d6a4f;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+.alert-bar {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+
+  &.alert-error { background: #ffebee; color: #c62828; }
+}

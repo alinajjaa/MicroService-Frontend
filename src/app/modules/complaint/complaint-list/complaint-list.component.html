@@ -1,0 +1,358 @@
+<div class="complaints-container">
+
+  <!-- Header -->
+  <div class="complaints-header">
+    <div>
+      <h3 class="page-title">
+        {{ isAdmin ? 'Gestion des réclamations 📢'
+                   : 'Mes réclamations 📢' }}
+      </h3>
+      <p class="page-sub">
+        {{ filteredComplaints.length }} réclamation(s)
+      </p>
+    </div>
+    <button *ngIf="!isAdmin"
+            class="btn-create"
+            (click)="showForm = !showForm">
+      {{ showForm ? '✕ Annuler' : '+ Nouvelle réclamation' }}
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="error"
+       class="alert-bar alert-error">❌ {{ error }}</div>
+  <div *ngIf="success"
+       class="alert-bar alert-success">✅ {{ success }}</div>
+
+  <!-- Formulaire soumettre -->
+  <div class="form-card" *ngIf="showForm && !isAdmin">
+    <h5 class="form-card-title">📝 Soumettre une réclamation</h5>
+    <form [formGroup]="form" (ngSubmit)="submitComplaint()">
+      <div class="form-group">
+        <label>Sujet *</label>
+        <input type="text"
+               class="form-input"
+               formControlName="subject"
+               placeholder="Résumez votre réclamation"
+               [class.invalid]="form.get('subject')?.invalid
+                 && form.get('subject')?.touched">
+        <span class="error-msg"
+              *ngIf="form.get('subject')?.invalid
+                  && form.get('subject')?.touched">
+          Sujet requis
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Description * (min. 20 caractères)</label>
+        <textarea class="form-input"
+                  formControlName="description"
+                  rows="4"
+                  placeholder="Décrivez votre problème en détail..."
+                  [class.invalid]="
+                    form.get('description')?.invalid
+                    && form.get('description')?.touched">
+        </textarea>
+        <div class="char-count">
+          {{ form.get('description')?.value?.length || 0 }}
+          caractères
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button"
+                class="btn-cancel"
+                (click)="showForm=false; form.reset()">
+          Annuler
+        </button>
+        <button type="submit"
+                class="btn-save"
+                [disabled]="form.invalid">
+          📤 Soumettre
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Stats ADMIN -->
+  <div class="stats-row" *ngIf="isAdmin">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-value">{{ stats.total }}</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card" style="background:#fff8e1">
+      <div class="stat-icon">🟡</div>
+      <div class="stat-value" style="color:#b7791f">
+        {{ stats.pending }}
+      </div>
+      <div class="stat-label">En attente</div>
+    </div>
+    <div class="stat-card" style="background:#e3f2fd">
+      <div class="stat-icon">🔵</div>
+      <div class="stat-value" style="color:#1565c0">
+        {{ stats.inProgress }}
+      </div>
+      <div class="stat-label">En cours</div>
+    </div>
+    <div class="stat-card" style="background:#e8f5e9">
+      <div class="stat-icon">🟢</div>
+      <div class="stat-value" style="color:#2e7d32">
+        {{ stats.resolved }}
+      </div>
+      <div class="stat-label">Résolus</div>
+    </div>
+    <div class="stat-card" style="background:#ffebee">
+      <div class="stat-icon">🔴</div>
+      <div class="stat-value" style="color:#c62828">
+        {{ stats.rejected }}
+      </div>
+      <div class="stat-label">Rejetés</div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="filters-section">
+    <button class="filter-btn"
+            [class.active]="!selectedStatus"
+            (click)="selectedStatus=''; applyFilters()">
+      Tous
+    </button>
+    <button *ngFor="let s of statuses"
+            class="filter-btn"
+            [class.active]="selectedStatus === s.value"
+            (click)="selectedStatus=s.value; applyFilters()">
+      {{ s.icon }} {{ s.label }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && filteredComplaints.length === 0"
+       class="empty-state">
+    <div class="empty-icon">📢</div>
+    <h5>Aucune réclamation</h5>
+    <p>{{ isAdmin ? 'Aucune réclamation pour le moment'
+                  : 'Vous n\'avez pas encore de réclamation' }}
+    </p>
+  </div>
+
+  <!-- Liste -->
+  <div class="complaints-list"
+       *ngIf="!loading && filteredComplaints.length > 0">
+    <div class="complaint-card"
+         *ngFor="let c of filteredComplaints"
+         (click)="openDetail(c)">
+
+      <div class="card-left">
+        <div class="status-dot"
+             [style.background]="
+               getStatusInfo(c.status).icon === '🟢'
+               ? '#4caf50'
+               : getStatusInfo(c.status).icon === '🔵'
+               ? '#2196f3'
+               : getStatusInfo(c.status).icon === '🟡'
+               ? '#ff9800'
+               : '#f44336'">
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="card-header">
+          <h6 class="card-subject">{{ c.subject }}</h6>
+          <span class="status-pill"
+                [style.background]="
+                  getStatusInfo(c.status).color"
+                [style.color]="
+                  getStatusInfo(c.status).text">
+            {{ getStatusInfo(c.status).icon }}
+            {{ getStatusInfo(c.status).label }}
+          </span>
+        </div>
+        <p class="card-desc">{{ c.description }}</p>
+        <div class="card-footer">
+          <span class="meta-item" *ngIf="isAdmin">
+            👤 {{ c.userId | slice:0:8 }}...
+          </span>
+          <span class="meta-item">
+            📅 {{ c.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+          <span class="meta-item timeline-count">
+            🕐 {{ c.history?.length || 0 }} étape(s)
+          </span>
+        </div>
+      </div>
+
+      <div class="card-arrow">→</div>
+    </div>
+  </div>
+
+  <!-- ✅ Modal Détail + Timeline -->
+  <div class="modal-overlay"
+       *ngIf="showDetail && selectedComplaint"
+       (click)="closeDetail()">
+    <div class="modal-box"
+         (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title">
+            {{ selectedComplaint.subject }}
+          </h5>
+          <span class="status-pill"
+                [style.background]="
+                  getStatusInfo(selectedComplaint.status).color"
+                [style.color]="
+                  getStatusInfo(selectedComplaint.status).text">
+            {{ getStatusInfo(selectedComplaint.status).icon }}
+            {{ getStatusInfo(selectedComplaint.status).label }}
+          </span>
+        </div>
+        <button class="modal-close"
+                (click)="closeDetail()">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        <!-- Description -->
+        <div class="detail-section">
+          <div class="section-label">Description</div>
+          <p class="detail-desc">
+            {{ selectedComplaint.description }}
+          </p>
+          <div class="detail-meta">
+            <span *ngIf="isAdmin">
+              👤 {{ selectedComplaint.userId }}
+            </span>
+            <span>
+              📅 Créé le
+              {{ selectedComplaint.createdAt
+                 | date:'dd/MM/yyyy à HH:mm' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- ✅ Timeline -->
+        <div class="detail-section">
+          <div class="section-label">
+            🕐 Historique des statuts
+          </div>
+          <div class="timeline">
+            <div class="timeline-item"
+                 *ngFor="let h of selectedComplaint.history;
+                          let last = last">
+
+              <div class="timeline-left">
+                <div class="timeline-dot"
+                     [class.dot-pending]="
+                       h.newStatus === 'PENDING'"
+                     [class.dot-progress]="
+                       h.newStatus === 'IN_PROGRESS'"
+                     [class.dot-resolved]="
+                       h.newStatus === 'RESOLVED'"
+                     [class.dot-rejected]="
+                       h.newStatus === 'REJECTED'">
+                </div>
+                <div class="timeline-line"
+                     *ngIf="!last"></div>
+              </div>
+
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <span class="timeline-status">
+                    {{ getStatusInfo(h.newStatus).icon }}
+                    {{ getStatusInfo(h.newStatus).label }}
+                  </span>
+                  <span class="timeline-date">
+                    {{ h.changedAt
+                       | date:'dd/MM/yyyy HH:mm' }}
+                  </span>
+                </div>
+                <p class="timeline-comment"
+                   *ngIf="h.comment">
+                  💬 {{ h.comment }}
+                </p>
+                <div class="timeline-arrow"
+                     *ngIf="h.oldStatus">
+                  <span class="old-status">
+                    {{ getStatusInfo(h.oldStatus).label }}
+                  </span>
+                  <span>→</span>
+                  <span class="new-status">
+                    {{ getStatusInfo(h.newStatus).label }}
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ Changer statut — ADMIN seulement -->
+        <div class="detail-section"
+             *ngIf="isAdmin &&
+               selectedComplaint.status !== 'RESOLVED' &&
+               selectedComplaint.status !== 'REJECTED'">
+          <div class="section-label">
+            ⚙️ Mettre à jour le statut
+          </div>
+          <form [formGroup]="statusForm"
+                (ngSubmit)="updateStatus()">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nouveau statut *</label>
+                <select class="form-input"
+                        formControlName="status">
+                  <option *ngFor="let s of statuses"
+                          [value]="s.value">
+                    {{ s.icon }} {{ s.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Commentaire *</label>
+              <textarea class="form-input"
+                        formControlName="comment"
+                        rows="2"
+                        placeholder="Expliquez le changement de statut...">
+              </textarea>
+            </div>
+            <div class="status-actions">
+              <button type="button"
+                      class="btn-delete"
+                      (click)="deleteComplaint(
+                        selectedComplaint!.id)">
+                🗑️ Supprimer
+              </button>
+              <button type="submit"
+                      class="btn-save"
+                      [disabled]="statusForm.invalid">
+                💾 Mettre à jour
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Bouton supprimer si résolu/rejeté -->
+        <div class="detail-section"
+             *ngIf="isAdmin && (
+               selectedComplaint.status === 'RESOLVED' ||
+               selectedComplaint.status === 'REJECTED')">
+          <button class="btn-delete w-100"
+                  (click)="deleteComplaint(
+                    selectedComplaint!.id)">
+            🗑️ Supprimer cette réclamation
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

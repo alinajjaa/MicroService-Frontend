@@ -1,0 +1,250 @@
+<div class="mood-admin">
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="header-left">
+      <div class="header-icon">😊</div>
+      <div>
+        <h3 class="header-title">Gestion des Humeurs</h3>
+        <p class="header-sub">
+          Suivez le bien-être de vos utilisateurs
+        </p>
+      </div>
+    </div>
+    <button class="btn-refresh" (click)="loadAllMoods()">
+      <span class="refresh-icon">🔄</span>
+      Actualiser
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-card-inner">
+        <div class="stat-icon-wrap stat-blue">
+          <span>📊</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.total }}</div>
+          <div class="stat-label">Total entrées</div>
+        </div>
+      </div>
+      <div class="stat-trend">
+        ↑ Toutes les humeurs
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-card-inner">
+        <div class="stat-icon-wrap stat-green">
+          <span>{{ getMoodEmoji(stats.avg) }}</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value">{{ stats.avg }}/10</div>
+          <div class="stat-label">Moyenne globale</div>
+        </div>
+      </div>
+      <div class="stat-progress">
+        <div class="progress-bar">
+          <div class="progress-fill"
+               [style.width]="(stats.avg * 10) + '%'">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-success">
+      <div class="stat-card-inner">
+        <div class="stat-icon-wrap stat-success">
+          <span>😄</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value text-success">
+            {{ stats.happy }}
+          </div>
+          <div class="stat-label">Bonne humeur ≥7</div>
+        </div>
+      </div>
+      <div class="stat-percent" *ngIf="stats.total > 0">
+        {{ ((stats.happy / stats.total) * 100).toFixed(0) }}%
+        des utilisateurs
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-danger">
+      <div class="stat-card-inner">
+        <div class="stat-icon-wrap stat-danger">
+          <span>😢</span>
+        </div>
+        <div class="stat-info">
+          <div class="stat-value text-danger">
+            {{ stats.sad }}
+          </div>
+          <div class="stat-label">Mauvaise humeur ≤3</div>
+        </div>
+      </div>
+      <div class="stat-percent stat-percent-danger"
+           *ngIf="stats.total > 0">
+        {{ ((stats.sad / stats.total) * 100).toFixed(0) }}%
+        des utilisateurs
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text"
+             [(ngModel)]="searchTerm"
+             (ngModelChange)="search()"
+             placeholder="Rechercher par utilisateur ou note..."
+             class="search-input">
+      <button *ngIf="searchTerm"
+              class="search-clear"
+              (click)="searchTerm=''; search()">
+        ✕
+      </button>
+    </div>
+
+    <div class="level-filters">
+      <button class="level-btn"
+              [class.active]="!filterLevel"
+              (click)="filterLevel=''; search()">
+        Tous
+      </button>
+      <button *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]"
+              class="level-btn"
+              [class.active]="filterLevel == i"
+              (click)="filterLevel=i; search()">
+        {{ getMoodEmoji(i) }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert-error">
+    ❌ {{ error }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Chargement des humeurs...</p>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap" *ngIf="!loading">
+
+    <!-- Count -->
+    <div class="table-meta">
+      <span class="table-count">
+        {{ filteredMoods.length }} résultat(s)
+        sur {{ moods.length }}
+      </span>
+    </div>
+
+    <div class="table-card">
+      <table class="mood-table">
+        <thead>
+          <tr>
+            <th>Humeur</th>
+            <th>Niveau</th>
+            <th>Utilisateur</th>
+            <th>Note</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="filteredMoods.length === 0">
+            <td colspan="6" class="empty-row">
+              <div class="empty-state">
+                <span class="empty-icon">😶</span>
+                <p>Aucune humeur trouvée</p>
+              </div>
+            </td>
+          </tr>
+          <tr *ngFor="let mood of filteredMoods"
+              class="table-row"
+              [style.border-left-color]="
+                getMoodColor(mood.moodLevel)">
+
+            <!-- Humeur -->
+            <td>
+              <span class="mood-emoji-cell">
+                {{ getMoodEmoji(mood.moodLevel) }}
+              </span>
+            </td>
+
+            <!-- Niveau -->
+            <td>
+              <div class="level-wrap">
+                <span class="level-badge"
+                      [style.background]="
+                        getMoodColor(mood.moodLevel)">
+                  {{ mood.moodLevel }}/10
+                </span>
+                <div class="level-bar">
+                  <div class="level-fill"
+                       [style.width]="
+                         (mood.moodLevel * 10) + '%'"
+                       [style.background]="
+                         getLevelColor(mood.moodLevel)">
+                  </div>
+                </div>
+                <small class="level-label">
+                  {{ getMoodLabel(mood.moodLevel) }}
+                </small>
+              </div>
+            </td>
+
+            <!-- Utilisateur -->
+            <td>
+              <div class="user-wrap">
+                <div class="user-avatar">
+                  {{ getUserName(mood.userId)
+                       .charAt(0).toUpperCase() }}
+                </div>
+                <span class="user-name">
+                  {{ getUserName(mood.userId) }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Note -->
+            <td>
+              <span class="note-text"
+                    [title]="mood.note || ''">
+                {{ mood.note || '—' }}
+              </span>
+            </td>
+
+            <!-- Date -->
+            <td>
+              <div class="date-wrap">
+                <span class="date-day">
+                  {{ mood.createdAt | date:'dd/MM/yyyy' }}
+                </span>
+                <span class="date-time text-muted">
+                  {{ mood.createdAt | date:'HH:mm' }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <button class="btn-delete"
+                      (click)="deleteMood(mood.id)"
+                      title="Supprimer">
+                🗑️
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

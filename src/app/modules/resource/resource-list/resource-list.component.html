@@ -1,0 +1,123 @@
+<div class="resources-container">
+
+  <!-- Header -->
+  <div class="resources-header">
+    <div>
+      <h3 class="page-title">Ressources bien-être 📚</h3>
+      <p class="page-sub">
+        {{ filteredResources.length }} ressource(s) disponible(s)
+      </p>
+    </div>
+    <button *ngIf="isAdmin"
+            class="btn-create"
+            (click)="goToCreate()">
+      + Ajouter une ressource
+    </button>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="error"
+       class="alert-bar alert-error">❌ {{ error }}</div>
+  <div *ngIf="success"
+       class="alert-bar alert-success">✅ {{ success }}</div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="search-wrap">
+      <span>🔍</span>
+      <input type="text"
+             [(ngModel)]="searchTerm"
+             (ngModelChange)="applyFilters()"
+             placeholder="Rechercher une ressource..."
+             class="search-input">
+    </div>
+    <div class="type-filters">
+      <button class="type-btn"
+              [class.active]="!selectedType"
+              (click)="selectedType=''; applyFilters()">
+        Tout
+      </button>
+      <button *ngFor="let t of types"
+              class="type-btn"
+              [class.active]="selectedType === t.value"
+              (click)="selectedType=t.value; applyFilters()">
+        {{ t.icon }} {{ t.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Chargement des ressources...</p>
+  </div>
+
+  <!-- Empty -->
+  <div *ngIf="!loading && filteredResources.length === 0"
+       class="empty-state">
+    <div class="empty-icon">📚</div>
+    <h5>Aucune ressource trouvée</h5>
+    <p>Modifiez vos filtres ou ajoutez une ressource</p>
+  </div>
+
+  <!-- Grid -->
+  <div class="resources-grid"
+       *ngIf="!loading && filteredResources.length > 0">
+    <div class="resource-card"
+         *ngFor="let resource of filteredResources"
+         [style.border-left-color]="getTypeColor(resource.type)">
+
+      <!-- Card Top -->
+      <div class="card-top"
+           [style.background]="getTypeColor(resource.type)">
+        <div class="card-image"
+             *ngIf="resource.thumbnailUrl"
+             [style.backgroundImage]="
+               'url(' + resource.thumbnailUrl + ')'">
+        </div>
+        <div class="card-placeholder" *ngIf="!resource.thumbnailUrl">
+          {{ getTypeInfo(resource.type).icon }}
+        </div>
+        <div class="type-badge">
+          {{ getTypeInfo(resource.type).icon }}
+          {{ getTypeInfo(resource.type).label }}
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <div class="card-body">
+        <h5 class="resource-title">{{ resource.title }}</h5>
+        <p class="resource-desc">{{ resource.description }}</p>
+
+        <div class="resource-meta">
+          <span class="resource-category">
+            🏷️ {{ resource.category }}
+          </span>
+          <span class="resource-date">
+            {{ resource.createdAt | date:'dd/MM/yyyy' }}
+          </span>
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <button class="btn-open"
+                  (click)="openUrl(resource.url)">
+            🔗 Ouvrir
+          </button>
+          <div *ngIf="isAdmin" class="admin-actions">
+            <button class="btn-icon-edit"
+                    (click)="goToEdit(resource.id)">
+              ✏️
+            </button>
+            <button class="btn-icon-del"
+                    (click)="deleteResource(resource.id)">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

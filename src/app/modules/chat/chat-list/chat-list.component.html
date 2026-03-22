@@ -1,0 +1,257 @@
+<div class="messenger">
+
+  <!-- ─── Sidebar conversations ─── -->
+  <div class="conv-panel"
+       [class.hidden]="selectedConversation">
+
+    <!-- Header -->
+    <div class="conv-header">
+      <div class="conv-title-row">
+        <h4 class="conv-title">
+          Messages
+          <span class="unread-badge"
+                *ngIf="totalUnread > 0">
+            {{ totalUnread }}
+          </span>
+        </h4>
+        <button class="btn-new"
+                (click)="openNewChat()"
+                title="Nouveau message">
+          ✏️
+        </button>
+      </div>
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text"
+               [(ngModel)]="searchTerm"
+               (ngModelChange)="applySearch()"
+               placeholder="Rechercher..."
+               class="search-input">
+      </div>
+    </div>
+
+    <!-- ✅ New Chat Modal -->
+    <div class="new-chat-overlay"
+         *ngIf="showNewChat"
+         (click)="showNewChat=false">
+      <div class="new-chat-box"
+           (click)="$event.stopPropagation()">
+        <div class="new-chat-header">
+          <h6>Nouvelle conversation</h6>
+          <button (click)="showNewChat=false"
+                  class="close-btn">✕</button>
+        </div>
+        <div class="search-box mb-2">
+          <span class="search-icon">🔍</span>
+          <input type="text"
+                 [(ngModel)]="userSearch"
+                 (ngModelChange)="searchUsers()"
+                 placeholder="Chercher un utilisateur..."
+                 class="search-input"
+                 autofocus>
+        </div>
+        <div class="users-list">
+          <div class="user-item"
+               *ngFor="let u of filteredUsers"
+               (click)="startNewChat(u)">
+            <div class="user-avatar-sm"
+                 [style.background]="
+                   getAvatarColor(
+                     u.firstName + ' ' + u.lastName)">
+              {{ getInitials(
+                 u.firstName + ' ' + u.lastName) }}
+            </div>
+            <div class="user-info">
+              <div class="user-name">
+                {{ u.firstName }} {{ u.lastName }}
+              </div>
+              <div class="user-email">{{ u.email }}</div>
+            </div>
+          </div>
+          <div class="empty-users"
+               *ngIf="filteredUsers.length === 0">
+            Aucun utilisateur trouvé
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversations List -->
+    <div class="conv-list">
+      <div *ngIf="filteredConversations.length === 0"
+           class="empty-conv">
+        <div class="empty-icon">💬</div>
+        <p>Aucune conversation</p>
+        <button class="btn-start"
+                (click)="openNewChat()">
+          Démarrer une conversation
+        </button>
+      </div>
+
+      <!-- ✅ Conv item avec vrai nom -->
+      <div *ngFor="let conv of filteredConversations"
+           class="conv-item"
+           [class.active]="
+             selectedConversation?.id === conv.id"
+           (click)="selectConversation(conv)">
+
+        <div class="conv-avatar"
+             [style.background]="
+               getAvatarColor(conv.otherUserName || 'U')">
+          {{ getInitials(conv.otherUserName || 'U') }}
+          <span class="online-dot"></span>
+        </div>
+
+        <div class="conv-info">
+          <div class="conv-top">
+            <span class="conv-name">
+              {{ conv.otherUserName || 'Utilisateur' }}
+            </span>
+            <span class="conv-time">
+              {{ formatTime(conv.lastMessageAt) }}
+            </span>
+          </div>
+          <div class="conv-bottom">
+            <span class="conv-last"
+                  [class.unread]="conv.unreadCount > 0">
+              <span *ngIf="conv.lastMessageSenderId
+                           === user.keycloakId"
+                    class="you-prefix">Vous : </span>
+              {{ conv.lastMessage || 'Nouvelle conversation' }}
+            </span>
+            <span class="conv-badge"
+                  *ngIf="conv.unreadCount > 0">
+              {{ conv.unreadCount }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Chat Panel ─── -->
+  <div class="chat-panel"
+       [class.active]="selectedConversation">
+
+    <!-- No conversation selected -->
+    <div class="no-conv" *ngIf="!selectedConversation">
+      <div class="no-conv-icon">💬</div>
+      <h5>Vos messages</h5>
+      <p>Sélectionnez une conversation ou
+         démarrez-en une nouvelle</p>
+      <button class="btn-start"
+              (click)="openNewChat()">
+        ✏️ Nouveau message
+      </button>
+    </div>
+
+    <!-- Conversation active -->
+    <ng-container *ngIf="selectedConversation">
+
+      <!-- ✅ Chat Header avec vrai nom -->
+      <div class="chat-header">
+        <button class="btn-back"
+                (click)="selectedConversation = null">
+          ←
+        </button>
+        <div class="chat-avatar"
+             [style.background]="
+               getAvatarColor(
+                 selectedConversation.otherUserName || 'U')">
+          {{ getInitials(
+             selectedConversation.otherUserName || 'U') }}
+        </div>
+        <div class="chat-user-info">
+          <div class="chat-user-name">
+            {{ selectedConversation.otherUserName
+               || 'Utilisateur' }}
+          </div>
+          <div class="chat-user-status">
+            🟢 En ligne
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-area">
+        <div *ngIf="loadingMessages"
+             class="loading-msgs">
+          <div class="spinner-sm"></div>
+        </div>
+
+        <div *ngIf="!loadingMessages &&
+                    messages.length === 0"
+             class="empty-msgs">
+          <p>Envoyez le premier message ! 👋</p>
+        </div>
+
+        <div *ngFor="let msg of messages"
+             class="message-wrapper"
+             [class.mine]="isMine(msg)"
+             [class.theirs]="!isMine(msg)">
+
+          <!-- Avatar (autres) avec couleur -->
+          <div class="msg-avatar"
+               *ngIf="!isMine(msg)"
+               [style.background]="
+                 getAvatarColor(msg.senderName || 'U')">
+            {{ getInitials(msg.senderName || 'U') }}
+          </div>
+
+          <!-- Bubble -->
+          <div class="msg-bubble-wrap">
+            <!-- Nom expéditeur (autres) -->
+            <div class="msg-sender-name"
+                 *ngIf="!isMine(msg)">
+              {{ msg.senderName }}
+            </div>
+            <div class="msg-bubble"
+                 [class.mine]="isMine(msg)"
+                 [class.deleted]="msg.deleted">
+              {{ msg.content }}
+            </div>
+            <div class="msg-meta">
+              <span class="msg-time">
+                {{ formatTime(msg.createdAt) }}
+              </span>
+              <span class="msg-read"
+                    *ngIf="isMine(msg)">
+                {{ msg.read ? '✓✓' : '✓' }}
+              </span>
+              <button class="msg-delete"
+                      *ngIf="isMine(msg) && !msg.deleted"
+                      (click)="deleteMessage(msg.id)">
+                🗑
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div #messagesEnd></div>
+      </div>
+
+      <!-- Input -->
+      <div class="chat-input-area">
+        <div class="input-wrap">
+          <textarea class="msg-input"
+                    [(ngModel)]="newMessage"
+                    (keydown)="onKeydown($event)"
+                    placeholder="Écrivez un message..."
+                    rows="1">
+          </textarea>
+          <button class="btn-send"
+                  (click)="sendMessage()"
+                  [disabled]="!newMessage.trim()">
+            ➤
+          </button>
+        </div>
+        <div class="input-hint">
+          Entrée pour envoyer · Maj+Entrée pour nouvelle ligne
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+
+</div>

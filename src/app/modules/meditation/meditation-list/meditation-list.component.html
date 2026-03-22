@@ -1,0 +1,181 @@
+<div class="meditation-container">
+
+  <!-- Header -->
+<!-- Header -->
+<div class="meditation-header">
+  <div>
+    <h3 class="page-title">Méditations 🧘</h3>
+    <p class="page-sub">
+      Choisissez une séance et méditez
+    </p>
+  </div>
+  <button *ngIf="isAdmin"
+          class="btn-create"
+          (click)="goToCreate()">
+    + Nouvelle séance
+  </button>
+</div>
+
+  <!-- Alerts -->
+  <div *ngIf="error" class="alert-bar alert-error">
+    ❌ {{ error }}
+  </div>
+  <div *ngIf="success" class="alert-bar alert-success">
+    ✅ {{ success }}
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" *ngIf="stats">
+    <div class="stat-card">
+      <div class="stat-val">{{ stats.totalSessions }}</div>
+      <div class="stat-label">Séances</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">{{ stats.completedSessions }}</div>
+      <div class="stat-label">Terminées</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">{{ stats.totalMinutes }}</div>
+      <div class="stat-label">Minutes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">
+        {{ stats.completionRate }}%
+      </div>
+      <div class="stat-label">Taux</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-row">
+    <button class="tab-btn"
+            [class.active]="activeTab === 'sessions'"
+            (click)="activeTab = 'sessions'">
+      🧘 Séances
+    </button>
+    <button class="tab-btn"
+            [class.active]="activeTab === 'history'"
+            (click)="activeTab = 'history'">
+      📋 Mon historique
+    </button>
+  </div>
+
+  <!-- ===== TAB SESSIONS ===== -->
+  <div *ngIf="activeTab === 'sessions'">
+
+    <!-- Filtre catégorie -->
+    <div class="category-filter">
+      <button *ngFor="let cat of categories"
+              class="filter-btn"
+              [class.active]="selectedCategory === cat.value"
+              (click)="filterByCategory(cat.value)">
+        {{ cat.emoji }} {{ cat.label }}
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement...</p>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && filteredSessions.length === 0"
+         class="empty-state">
+      <div class="empty-icon">🧘</div>
+      <h5>Aucune séance disponible</h5>
+      <p>Revenez bientôt !</p>
+    </div>
+
+    <!-- Grid séances -->
+    <div class="sessions-grid"
+         *ngIf="!loading && filteredSessions.length > 0">
+      <div class="session-card"
+           *ngFor="let session of filteredSessions"
+           [style.border-top-color]="
+             getCategoryColor(session.category)">
+
+        <!-- Top -->
+        <div class="session-top"
+             [style.background]="
+               getCategoryColor(session.category)">
+          <div class="session-emoji">
+            {{ getCategoryInfo(session.category).emoji }}
+          </div>
+          <div class="session-duration-badge">
+            ⏱️ {{ session.duration }} min
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="session-body">
+          <h5 class="session-title">{{ session.title }}</h5>
+          <p class="session-desc">{{ session.description }}</p>
+          <span class="session-category-badge">
+            {{ getCategoryInfo(session.category).label }}
+          </span>
+        </div>
+
+        <!-- Action -->
+        <div class="session-footer">
+          <button class="btn-start"
+                  (click)="startSession(session)">
+            ▶️ Commencer
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TAB HISTORY ===== -->
+  <div *ngIf="activeTab === 'history'">
+
+    <!-- Empty -->
+    <div *ngIf="history.length === 0"
+         class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h5>Aucune séance dans l'historique</h5>
+      <p>Commencez une méditation !</p>
+    </div>
+
+    <!-- Liste historique -->
+    <div class="history-list" *ngIf="history.length > 0">
+      <div class="history-card"
+           *ngFor="let h of history">
+
+        <div class="history-left">
+          <span class="history-emoji">
+            {{ getCategoryInfo(h.category).emoji }}
+          </span>
+        </div>
+
+        <div class="history-body">
+          <div class="history-title fw-bold">
+            {{ h.sessionTitle }}
+          </div>
+          <div class="history-meta">
+            <span class="history-duration">
+              ⏱️ {{ h.actualDuration }}/{{ h.plannedDuration }} min
+            </span>
+            <span class="history-status">
+              {{ getStatusLabel(h.status) }}
+            </span>
+          </div>
+          <small class="text-muted">
+            📅 {{ h.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </small>
+        </div>
+
+        <button class="btn-icon-del"
+                (click)="deleteHistory(h.id)">
+          🗑️
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,87 @@
+<div class="timer-container">
+
+  <!-- Session terminée -->
+  <div *ngIf="isFinished" class="finished-card">
+    <div class="finished-emoji">🎉</div>
+    <h3>Félicitations !</h3>
+    <p>Vous avez complété votre séance de méditation</p>
+
+    <div class="finished-stats">
+      <div class="f-stat">
+        <div class="f-val">{{ session?.duration }}</div>
+        <div class="f-label">Minutes</div>
+      </div>
+      <div class="f-stat">
+        <div class="f-val">✅</div>
+        <div class="f-label">Terminée</div>
+      </div>
+    </div>
+
+    <button class="btn-back" (click)="goBack()">
+      ← Retour aux séances
+    </button>
+  </div>
+
+  <!-- Timer en cours -->
+  <div *ngIf="!isFinished" class="timer-card">
+
+    <!-- Header -->
+    <div class="timer-header">
+      <button class="btn-back-small" (click)="goBack()">
+        ← Retour
+      </button>
+      <h4 class="timer-title">{{ session?.title }}</h4>
+      <span class="timer-category">
+        {{ session?.category }}
+      </span>
+    </div>
+
+    <!-- Cercle timer -->
+    <div class="timer-circle-wrap">
+      <svg viewBox="0 0 200 200"
+           class="timer-svg">
+        <!-- Cercle fond -->
+        <circle cx="100" cy="100" r="90"
+                fill="none"
+                stroke="#e8f5e9"
+                stroke-width="12"/>
+        <!-- Cercle progression -->
+        <circle cx="100" cy="100" r="90"
+                fill="none"
+                stroke="#43a047"
+                stroke-width="12"
+                stroke-linecap="round"
+                [attr.stroke-dasharray]="565"
+                [attr.stroke-dashoffset]="
+                  565 - (565 * progressPercent / 100)"
+                transform="rotate(-90 100 100)"/>
+      </svg>
+      <div class="timer-time">{{ formattedTime }}</div>
+    </div>
+
+    <!-- Progression -->
+    <div class="progress-info">
+      {{ progressPercent }}% complété
+    </div>
+
+    <!-- Contrôles -->
+    <div class="timer-controls">
+      <button *ngIf="isRunning"
+              class="btn-control btn-pause"
+              (click)="pauseTimer()">
+        ⏸️ Pause
+      </button>
+      <button *ngIf="isPaused"
+              class="btn-control btn-resume"
+              (click)="resumeTimer()">
+        ▶️ Reprendre
+      </button>
+      <button class="btn-control btn-stop"
+              (click)="stopSession()">
+        ⏹️ Arrêter
+      </button>
+    </div>
+
+  </div>
+
+</div>
