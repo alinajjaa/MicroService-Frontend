@@ -1,1 +1,6 @@
-<p>backoffice works!</p>
+<div class="backoffice-layout">
+  <app-sidebar></app-sidebar>
+  <main class="backoffice-main" [class.sidebar-collapsed]="sidebarCollapsed">
+    <router-outlet></router-outlet>
+  </main>
+</div>

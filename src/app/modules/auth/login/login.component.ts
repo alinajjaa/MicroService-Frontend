@@ -21,7 +21,7 @@ export class LoginComponent {
   form:          FormGroup;
   loading      = false;
   error        = '';
-  showPass     = false;   // ✅
+  showPass     = false;
   emailFocused = false;
   passFocused  = false;
 
@@ -59,5 +59,10 @@ export class LoginComponent {
         this.loading = false;
       }
     });
+  }
+
+  // ✅ Login avec Google
+  loginWithGoogle(): void {
+    this.authService.loginWithGoogle();
   }
 }

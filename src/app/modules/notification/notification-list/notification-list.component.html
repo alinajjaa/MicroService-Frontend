@@ -1,1 +1,64 @@
-<p>notification-list works!</p>
+<div class="notif-container">
+
+  <!-- Header -->
+  <div class="notif-header">
+    <div>
+      <h1 class="page-title">Notifications</h1>
+      <p class="page-sub">Restez informé de vos activités récentes</p>
+    </div>
+    <button class="btn-mark-all" *ngIf="unreadCount > 0">
+      ✓ Tout marquer comme lu
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-row">
+    <button class="tab-btn" [class.active]="activeTab === 'all'"    (click)="activeTab = 'all'">
+      Toutes
+      <span class="tab-count" *ngIf="notifications.length">{{ notifications.length }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'unread'" (click)="activeTab = 'unread'">
+      Non lues
+      <span class="tab-count unread" *ngIf="unreadCount">{{ unreadCount }}</span>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement…</p>
+  </div>
+
+  <!-- Empty -->
+  <div class="empty-state" *ngIf="!loading && filteredNotifications.length === 0">
+    <span class="empty-icon">🔔</span>
+    <h5>Aucune notification</h5>
+    <p>Vous êtes à jour !</p>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="notif-list" *ngIf="!loading && filteredNotifications.length > 0">
+    <div
+      class="notif-card"
+      *ngFor="let notif of filteredNotifications"
+      [class.unread]="!notif.read"
+      (click)="markAsRead(notif)"
+    >
+      <div class="notif-icon-wrap" [ngClass]="notif.type">
+        {{ getIcon(notif.type) }}
+      </div>
+
+      <div class="notif-body">
+        <p class="notif-title">{{ notif.title }}</p>
+        <p class="notif-message">{{ notif.message }}</p>
+        <span class="notif-time">{{ notif.createdAt | date:'d MMM, HH:mm' }}</span>
+      </div>
+
+      <div class="notif-actions">
+        <span class="unread-dot" *ngIf="!notif.read"></span>
+        <button class="btn-del" (click)="delete(notif.id); $event.stopPropagation()" title="Supprimer">🗑</button>
+      </div>
+    </div>
+  </div>
+
+</div>

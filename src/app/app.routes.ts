@@ -21,6 +21,12 @@ export const routes: Routes = [
       import('./modules/auth/register/register.component')
         .then(m => m.RegisterComponent)
   },
+  {
+    path: 'auth/callback',
+    loadComponent: () =>
+      import('./modules/auth/callback/callback.component')
+        .then(m => m.CallbackComponent)
+  },
 
   // ✅ Frontoffice USER
   {
@@ -37,11 +43,11 @@ export const routes: Routes = [
             .then(m => m.DashboardComponent)
       },
       {
-  path: 'profile',
-  loadComponent: () =>
-    import('./modules/profile/profile.component')
-      .then(m => m.ProfileComponent)
-},
+        path: 'profile',
+        loadComponent: () =>
+          import('./modules/profile/profile.component')
+            .then(m => m.ProfileComponent)
+      },
       {
         path: 'moods',
         loadComponent: () =>
@@ -87,18 +93,18 @@ export const routes: Routes = [
           import('./modules/event/event-list/event-list.component')
             .then(m => m.EventListComponent)
       },
-{
-  path: 'chat',
-  loadComponent: () =>
-    import('./modules/chat/chat-list/chat-list.component')
-      .then(m => m.ChatListComponent)
-},
-{
-  path: 'complaints',
-  loadComponent: () =>
-    import('./modules/complaint/complaint-list/complaint-list.component')
-      .then(m => m.ComplaintListComponent)
-}
+      {
+        path: 'chat',
+        loadComponent: () =>
+          import('./modules/chat/chat-list/chat-list.component')
+            .then(m => m.ChatListComponent)
+      },
+      {
+        path: 'complaints',
+        loadComponent: () =>
+          import('./modules/complaint/complaint-list/complaint-list.component')
+            .then(m => m.ComplaintListComponent)
+      }
     ]
   },
 
@@ -192,20 +198,20 @@ export const routes: Routes = [
       },
 
       // ✅ Complaints Admin
-{
-  path: 'complaints',
-  loadComponent: () =>
-    import('./modules/complaint/complaint-list/complaint-list.component')
-      .then(m => m.ComplaintListComponent)
-},
+      {
+        path: 'complaints',
+        loadComponent: () =>
+          import('./modules/complaint/complaint-list/complaint-list.component')
+            .then(m => m.ComplaintListComponent)
+      },
 
       // ✅ Chat Admin
-{
-  path: 'chat',
-  loadComponent: () =>
-    import('./modules/chat/chat-list/chat-list.component')
-      .then(m => m.ChatListComponent)
-}
+      {
+        path: 'chat',
+        loadComponent: () =>
+          import('./modules/chat/chat-list/chat-list.component')
+            .then(m => m.ChatListComponent)
+      }
     ]
   },
 

@@ -1,0 +1,24 @@
+.backoffice-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-body);
+}
+
+.backoffice-main {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  min-height: 100vh;
+  padding: var(--space-8) var(--space-6);
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.35s ease;
+  background: var(--bg-body);
+
+  &.sidebar-collapsed {
+    margin-left: var(--sidebar-collapsed);
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    padding: var(--space-6) var(--space-4);
+  }
+}

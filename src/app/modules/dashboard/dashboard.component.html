@@ -1,66 +1,89 @@
-<div class="dashboard-container">
+<div class="dashboard-wrap">
 
-  <!-- Welcome Banner -->
-  <div class="welcome-banner mb-4">
-    <div class="welcome-text">
-      <h2 class="mb-1">
-        Bonjour, {{ user?.firstName }} ! 👋
-      </h2>
-      <p class="mb-0 opacity-75">
-        Bienvenue sur votre espace bien-être personnel
-      </p>
+  <!-- ── Welcome Banner ── -->
+  <div class="welcome-banner anim-fade-up stagger-1">
+    <div class="welcome-body">
+      <div class="welcome-greeting">👋 Bonjour</div>
+      <h1 class="welcome-name">{{ user?.firstName }} !</h1>
+      <p class="welcome-sub">Bienvenue sur votre espace bien-être personnel</p>
+      <div class="welcome-date">
+        <span class="date-dot"></span>
+        {{ today | date:'EEEE d MMMM':'':'fr' }}
+      </div>
     </div>
-    <div class="welcome-illustration">🌿</div>
+    <div class="welcome-art">
+      <div class="art-circle c1"></div>
+      <div class="art-circle c2"></div>
+      <div class="art-circle c3"></div>
+      <span class="art-emoji">🌿</span>
+    </div>
   </div>
 
-  <!-- Stats Row -->
-  <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-      <div class="stat-card">
-        <div class="stat-icon">😊</div>
+  <!-- ── Stats Grid ── -->
+  <div class="stats-grid">
+    <div class="stat-card anim-fade-up stagger-2">
+      <div class="stat-icon-wrap si-mood">😊</div>
+      <div class="stat-body">
         <div class="stat-value">7</div>
         <div class="stat-label">Jours de suivi</div>
       </div>
+      <div class="stat-trend up">↑ 2</div>
     </div>
-    <div class="col-6 col-md-3">
-      <div class="stat-card">
-        <div class="stat-icon">🧘</div>
+    <div class="stat-card anim-fade-up stagger-3">
+      <div class="stat-icon-wrap si-meditation">🧘</div>
+      <div class="stat-body">
         <div class="stat-value">3</div>
         <div class="stat-label">Méditations</div>
       </div>
+      <div class="stat-trend up">↑ 1</div>
     </div>
-    <div class="col-6 col-md-3">
-      <div class="stat-card">
-        <div class="stat-icon">📚</div>
+    <div class="stat-card anim-fade-up stagger-4">
+      <div class="stat-icon-wrap si-resource">📚</div>
+      <div class="stat-body">
         <div class="stat-value">12</div>
         <div class="stat-label">Ressources lues</div>
       </div>
+      <div class="stat-trend up">↑ 5</div>
     </div>
-    <div class="col-6 col-md-3">
-      <div class="stat-card">
-        <div class="stat-icon">💬</div>
+    <div class="stat-card anim-fade-up stagger-5">
+      <div class="stat-icon-wrap si-chat">💬</div>
+      <div class="stat-body">
         <div class="stat-value">5</div>
         <div class="stat-label">Messages</div>
       </div>
+      <div class="stat-trend neutral">→ 0</div>
     </div>
   </div>
 
-  <!-- Module Cards -->
-  <h5 class="fw-bold mb-3 text-dark">Mes modules</h5>
-  <div class="row g-3">
-    <div class="col-12 col-sm-6 col-lg-4"
-         *ngFor="let card of cards">
-      <a [routerLink]="card.path"
-         class="module-card"
-         [style.background]="card.color">
-        <div class="module-icon">{{ card.icon }}</div>
-        <div class="module-info">
-          <h6 class="module-title">{{ card.title }}</h6>
-          <p class="module-desc">{{ card.description }}</p>
-        </div>
-        <div class="module-arrow">→</div>
-      </a>
-    </div>
+  <!-- ── Module Cards ── -->
+  <div class="section-header anim-fade-up stagger-6">
+    <h2 class="section-title">Mes modules</h2>
+    <p class="section-sub">Accédez rapidement à vos outils bien-être</p>
+  </div>
+
+  <div class="modules-grid">
+    <a *ngFor="let card of cards; let i = index"
+       [routerLink]="card.path"
+       class="module-card anim-fade-up"
+       [class.stagger-7]="i === 0"
+       [class.stagger-8]="i === 1"
+       [class.stagger-9]="i === 2"
+       [class.stagger-10]="i === 3"
+       [class.stagger-11]="i === 4"
+       [class.stagger-12]="i >= 5"
+       [style.--card-color]="card.color">
+      <div class="mc-icon">{{ card.icon }}</div>
+      <div class="mc-body">
+        <h6 class="mc-title">{{ card.title }}</h6>
+        <p class="mc-desc">{{ card.description }}</p>
+      </div>
+      <div class="mc-arrow">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </a>
   </div>
 
 </div>

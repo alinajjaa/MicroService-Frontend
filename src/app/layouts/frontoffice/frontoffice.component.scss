@@ -1,0 +1,12 @@
+.frontoffice-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-body);
+}
+
+.frontoffice-main {
+  margin-top: var(--navbar-height);
+  flex: 1;
+  animation: fadeIn 0.35s ease;
+}

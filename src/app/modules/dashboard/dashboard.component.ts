@@ -13,6 +13,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class DashboardComponent implements OnInit {
 
   user: any;
+  today = new Date();
 
   cards = [
     {

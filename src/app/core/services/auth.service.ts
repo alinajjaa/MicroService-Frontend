@@ -63,19 +63,30 @@ export class AuthService {
   }
 
   // ✅ Logout
-  logout(): void {
-    const refreshToken = this.getRefreshToken();
+logout(): void {
+  const idToken = localStorage.getItem('id_token');
+  const refreshToken = this.getRefreshToken();
+
+  localStorage.removeItem('token');
+  localStorage.removeItem('id_token');
+  localStorage.removeItem('refresh_token');
+  localStorage.removeItem('user');
+
+  if (idToken) {
+    const logoutUrl = 'http://localhost:8180/realms/wellbeing-realm/protocol/openid-connect/logout';
+    const params = new URLSearchParams({
+      client_id: 'wellbeing-client',
+      post_logout_redirect_uri: 'http://localhost:4200/login',
+      id_token_hint: idToken
+    });
+    window.location.href = `${logoutUrl}?${params.toString()}`;
+  } else {
     if (refreshToken) {
-      this.http.post(
-        `${this.apiUrl}/users/logout`,
-        { refreshToken }
-      ).subscribe();
+      this.http.post(`${this.apiUrl}/users/logout`, { refreshToken }).subscribe();
     }
-    localStorage.removeItem('token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user');
     this.router.navigate(['/login']);
   }
+}
 
   // ✅ Save access token
   saveToken(token: string): void {
@@ -133,4 +144,45 @@ export class AuthService {
   isCoach(): boolean {
     return this.getRole() === 'COACH';
   }
+
+loginWithGoogle(): void {
+  const keycloakUrl = 'http://localhost:8180/realms/wellbeing-realm/protocol/openid-connect/auth';
+  const params = new URLSearchParams({
+    client_id: 'wellbeing-client',
+    redirect_uri: 'http://localhost:4200/auth/callback',
+    response_type: 'code',
+    scope: 'openid email profile',
+    kc_idp_hint: 'google',
+    prompt: 'login'
+  });
+  window.location.href = `${keycloakUrl}?${params.toString()}`;
+}
+exchangeCode(code: string): Observable<any> {
+  const body = new URLSearchParams({
+    grant_type: 'authorization_code',
+    client_id: 'wellbeing-client',
+    client_secret: 'DknCiK0uApKWpPmL2sC5drAkUrzHGVJb',
+    code: code,
+    redirect_uri: 'http://localhost:4200/auth/callback'
+  });
+
+  return this.http.post(
+    'http://localhost:8180/realms/wellbeing-realm/protocol/openid-connect/token',
+    body.toString(),
+    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+  );
+}
+
+decodeToken(token: string): any {
+  try {
+    const payload = token.split('.')[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+}
+
+syncUser(userData: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/users/sync`, userData);
+}
 }

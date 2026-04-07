@@ -1,0 +1,61 @@
+<ng-container *ngIf="showChatbot">
+  <!-- Bouton flottant -->
+  <button class="chatbot-fab" (click)="toggle()" [class.active]="isOpen">
+    <span *ngIf="!isOpen">🤖</span>
+    <span *ngIf="isOpen">✕</span>
+  </button>
+
+  <!-- Fenêtre chat -->
+  <div class="chatbot-window" *ngIf="isOpen">
+
+    <!-- Header -->
+    <div class="chatbot-header">
+      <div class="chatbot-header-info">
+        <span class="chatbot-avatar">🤖</span>
+        <div>
+          <div class="chatbot-name">Assistant Bien-être</div>
+          <div class="chatbot-status">● En ligne</div>
+        </div>
+      </div>
+      <button class="chatbot-close" (click)="toggle()">✕</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="chatbot-messages">
+      <div class="chatbot-welcome" *ngIf="messages.length === 0">
+        <div class="welcome-emoji">🌿</div>
+        <p>Bonjour ! Je suis votre assistant bien-être.</p>
+        <p>Comment puis-je vous aider ?</p>
+      </div>
+
+      <div *ngFor="let msg of messages"
+           class="chatbot-msg"
+           [class.mine]="isMyMessage(msg)"
+           [class.bot]="!isMyMessage(msg)">
+        <div class="msg-bubble">{{ msg.content }}</div>
+        <div class="msg-time">
+          {{ msg.createdAt | date:'HH:mm' }}
+        </div>
+      </div>
+
+      <div class="chatbot-typing" *ngIf="loading">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chatbot-input">
+      <input type="text"
+             [(ngModel)]="message"
+             (keyup.enter)="send()"
+             placeholder="Écrivez votre message..."
+             [disabled]="loading">
+      <button (click)="send()" [disabled]="loading || !message.trim()">
+        ➤
+      </button>
+    </div>
+
+  </div>
+</ng-container>
