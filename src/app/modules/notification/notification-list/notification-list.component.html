@@ -6,18 +6,18 @@
       <h1 class="page-title">Notifications</h1>
       <p class="page-sub">Restez informé de vos activités récentes</p>
     </div>
-    <button class="btn-mark-all" *ngIf="unreadCount > 0">
+    <button class="btn-mark-all" *ngIf="unreadCount > 0" (click)="markAllAsRead()">
       ✓ Tout marquer comme lu
     </button>
   </div>
 
   <!-- Tabs -->
   <div class="tabs-row">
-    <button class="tab-btn" [class.active]="activeTab === 'all'"    (click)="activeTab = 'all'">
+    <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'; applyTab()">
       Toutes
       <span class="tab-count" *ngIf="notifications.length">{{ notifications.length }}</span>
     </button>
-    <button class="tab-btn" [class.active]="activeTab === 'unread'" (click)="activeTab = 'unread'">
+    <button class="tab-btn" [class.active]="activeTab === 'unread'" (click)="activeTab = 'unread'; applyTab()">
       Non lues
       <span class="tab-count unread" *ngIf="unreadCount">{{ unreadCount }}</span>
     </button>

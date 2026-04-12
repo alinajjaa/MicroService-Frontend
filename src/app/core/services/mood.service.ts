@@ -13,6 +13,8 @@ export interface MoodRequest {
 export interface MoodResponse {
   id: number;
   userId: string;        // ✅ string (keycloakId)
+  userName?: string;
+  userEmail?: string;
   moodLevel: number;
   note: string;
   date: string;

@@ -175,7 +175,7 @@
         <p class="card-desc">{{ c.description }}</p>
         <div class="card-footer">
           <span class="meta-item" *ngIf="isAdmin">
-            👤 {{ c.userId | slice:0:8 }}...
+            👤 {{ c.userName || (c.userFirstName + ' ' + c.userLastName) || (c.userId | slice:0:8) + '...' }}
           </span>
           <span class="meta-item">
             📅 {{ c.createdAt | date:'dd/MM/yyyy HH:mm' }}
@@ -227,7 +227,7 @@
           </p>
           <div class="detail-meta">
             <span *ngIf="isAdmin">
-              👤 {{ selectedComplaint.userId }}
+              👤 {{ selectedComplaint.userName || (selectedComplaint.userFirstName + ' ' + selectedComplaint.userLastName) || selectedComplaint.userId }}
             </span>
             <span>
               📅 Créé le

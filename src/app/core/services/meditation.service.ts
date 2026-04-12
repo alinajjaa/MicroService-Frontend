@@ -11,7 +11,8 @@ export interface MeditationSession {
   duration: number;
   imageUrl: string;
   isActive: boolean;
-    createdBy: string; // keycloakId
+  createdBy: string; // keycloakId
+  userName?: string;
   createdAt: string;
 }
 

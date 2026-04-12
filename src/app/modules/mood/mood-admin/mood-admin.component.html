@@ -203,11 +203,11 @@
             <td>
               <div class="user-wrap">
                 <div class="user-avatar">
-                  {{ getUserName(mood.userId)
+                  {{ (mood.userName || getUserName(mood.userId))
                        .charAt(0).toUpperCase() }}
                 </div>
                 <span class="user-name">
-                  {{ getUserName(mood.userId) }}
+                  {{ mood.userName || getUserName(mood.userId) }}
                 </span>
               </div>
             </td>

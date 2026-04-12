@@ -156,6 +156,11 @@
           📍 {{ event.location }}
         </div>
 
+        <div *ngIf="isAdmin && event.creatorName"
+             style="font-size:0.8rem;color:#888;margin-top:4px;">
+          👤 Créé par : {{ event.creatorName }}
+        </div>
+
         <!-- Rating -->
         <div class="event-rating" *ngIf="event.totalRatings > 0">
           <span *ngFor="let s of getStars(event.averageRating)">

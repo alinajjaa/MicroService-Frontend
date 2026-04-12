@@ -26,6 +26,9 @@ export interface ComplaintResponse {
   status: string;
   userId: string;
   userEmail?: string;
+  userName?: string;
+  userFirstName?: string;
+  userLastName?: string;
   createdAt: string;
   updatedAt?: string;
   history: ComplaintHistoryItem[];

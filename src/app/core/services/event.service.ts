@@ -23,6 +23,7 @@ export interface EventResponse {
   location: string;
   imageUrl?: string;
   createdBy?: string;
+  creatorName?: string;
   eventDate: string;
   maxParticipants: number;
   currentParticipants: number;

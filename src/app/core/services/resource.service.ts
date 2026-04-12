@@ -27,6 +27,7 @@ export interface ResourceResponse {
   durationMinutes?: number;    // ✅
   published: boolean;
   createdBy?: string;          // ✅ keycloakId
+  creatorName?: string;
   createdAt: string;
 }
 
