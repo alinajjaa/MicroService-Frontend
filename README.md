@@ -403,3 +403,11 @@ Le composant `ChatbotComponent` est un widget persistant injecté dans le layout
 Étudiant 4ème année Génie Logiciel — ESPRIT
 
 > Projet réalisé dans le cadre du module Microservices & Architecture Distribuée.
+
+## 🔗 Dépôts du Projet
+
+| Dépôt | Lien | Description |
+|-------|------|-------------|
+| 🎨 **Frontend** | [MicroService-Frontend](https://github.com/alinajjaa/MicroService-Frontend.git) | Angular 18 + Standalone Components |
+| 🖥️ **Backend** | [Microservice-Project](https://github.com/alinajjaa/Microservice-Project.git) | Spring Boot + Node.js + Docker |
+
